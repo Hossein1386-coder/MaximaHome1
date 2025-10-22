@@ -112,87 +112,55 @@ function showToast(message, type = 'success') {
 // Booking Form Submission (guarded for pages without the form)
 const bookingForm = document.getElementById('booking-form');
 if (bookingForm) {
-    bookingForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('name')?.value || '';
-        const phone = document.getElementById('phone')?.value || '';
-        const carModel = document.getElementById('carModel')?.value || '';
-        const service = document.getElementById('service')?.value || '';
-        const date = document.getElementById('date')?.value || '';
-        const time = document.getElementById('time')?.value || '';
-        const notes = document.getElementById('notes')?.value || '';
-        
-        if (!name || !phone || !service || !date || !time) {
-            showToast('لطفا تمام فیلدهای الزامی را پر کنید', 'error');
-            return;
-        }
-        
-        // Create booking object
-        const booking = {
-            id: Date.now(), // Simple ID generation
-            name: name,
-            phone: phone,
-            carModel: carModel,
-            service: service,
-            date: date,
-            time: time,
-            status: 'pending',
-            notes: notes,
-            createdAt: new Date().toISOString()
-        };
-        
-        // Save booking (Firestore if available, fallback to localStorage)
-        saveBooking(booking);
-        
-        // Here you would typically send the data to a backend
-        console.log('New booking:', booking);
-        
-        showToast('رزرو شما با موفقیت ثبت شد! به زودی با شما تماس می‌گیریم.');
-        
-        // Reset form
-        this.reset();
-    });
-
     // Set minimum date for booking (today)
     const dateInput = document.getElementById('date');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
     }
-}
-
-// Save booking to localStorage
-async function saveBooking(booking) {
-    // Try Firestore first
-    if (window.db) {
-        try {
-            const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-            await addDoc(collection(window.db, 'bookings'), booking);
-            console.log('Booking saved to Firestore');
+    
+    // Handle form submission
+    bookingForm.addEventListener('submit', function(e) {
+        const name = document.getElementById('name')?.value || '';
+        const phone = document.getElementById('phone')?.value || '';
+        const service = document.getElementById('service')?.value || '';
+        const date = document.getElementById('date')?.value || '';
+        const time = document.getElementById('time')?.value || '';
+        
+        if (!name || !phone || !service || !date || !time) {
+            e.preventDefault();
+            showToast('لطفا تمام فیلدهای الزامی را پر کنید', 'error');
             return;
-        } catch (error) {
-            console.warn('Firestore save failed, falling back to localStorage', error);
         }
-    }
-    // Fallback: localStorage
-    try {
-        const existingBookings = JSON.parse(localStorage.getItem('maxima-bookings') || '[]');
-        existingBookings.push(booking);
-        localStorage.setItem('maxima-bookings', JSON.stringify(existingBookings));
-        console.log('Booking saved to localStorage');
-    } catch (error) {
-        console.error('Error saving booking to localStorage:', error);
-    }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'در حال ارسال...';
+        submitBtn.disabled = true;
+        
+        // Reset button after a delay (in case of error)
+        setTimeout(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+    });
 }
 
-// Get all bookings from localStorage
-function getAllBookings() {
-    try {
-        return JSON.parse(localStorage.getItem('maxima-bookings') || '[]');
-    } catch (error) {
-        console.error('Error loading bookings:', error);
-        return [];
+// Check for success message on page load
+function checkForSuccessMessage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+        // Show success message
+        const form = document.getElementById('booking-form');
+        const successMessage = document.getElementById('success-message');
+        if (form && successMessage) {
+            form.style.display = 'none';
+            successMessage.classList.remove('hidden');
+        }
+        
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 }
 
@@ -242,6 +210,7 @@ function showLoadingScreen() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     handleScroll(); // Set initial active nav state
+    checkForSuccessMessage(); // Check for form success message
     
     // Hide loading screen after page is fully loaded (faster for minimal)
     if (document.readyState === 'complete') {

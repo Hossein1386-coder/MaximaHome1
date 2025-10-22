@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="module" src="firebase-init.js"></script>
     <!-- Primary Meta Tags -->
     <title>رزرو وقت تعمیرگاه ماکسیما هوم یزد | تعمیر خودروهای چینی، ژاپنی، کره‌ای و اروپایی</title>
     <meta name="title" content="رزرو وقت تعمیرگاه ماکسیما هوم یزد | تعمیر خودروهای چینی، ژاپنی، کره‌ای و اروپایی">
@@ -112,12 +111,16 @@
 
                 <!-- Booking Form -->
                 <div class="bg-white p-8 lg:p-10 rounded-3xl border border-black/5 shadow-xl">
-                    <form id="booking-form" class="space-y-6">
+                    <form id="booking-form" action="https://formspree.io/f/myzwydeq" method="POST" class="space-y-6">
+                        <!-- Hidden field for email subject -->
+                        <input type="hidden" name="_subject" value="رزرو جدید - تعمیرگاه ماکسیما هوم">
+                        <input type="hidden" name="_next" value="booking.html?success=true">
+                        
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Name -->
                             <div class="space-y-2">
                                 <label class="block text-black font-medium">نام و نام خانوادگی *</label>
-                                <input type="text" id="name" required
+                                <input type="text" id="name" name="name" required
                                        placeholder="نام خود را وارد کنید"
                                        class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                             </div>
@@ -125,7 +128,7 @@
                             <!-- Phone -->
                             <div class="space-y-2">
                                 <label class="block text-black font-medium">شماره تماس *</label>
-                                <input type="tel" id="phone" required
+                                <input type="tel" id="phone" name="phone" required
                                        placeholder="۰۹۱۲۳۴۵۶۷۸۹"
                                        class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                             </div>
@@ -134,7 +137,7 @@
                         <!-- Car Model -->
                         <div class="space-y-2">
                             <label class="block text-black font-medium">مدل خودرو</label>
-                            <input type="text" id="carModel"
+                            <input type="text" id="carModel" name="car_model"
                                    placeholder="مثال: پژو ۲۰۶"
                                    class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                         </div>
@@ -142,7 +145,7 @@
                         <!-- Service Type -->
                         <div class="space-y-2">
                             <label class="block text-black font-medium">نوع خدمات *</label>
-                            <select id="service" required
+                            <select id="service" name="service" required
                                     class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                                 <option value="">نوع خدمات را انتخاب کنید</option>
                                 <option value="تعمیرات موتور">تعمیرات موتور</option>
@@ -159,14 +162,14 @@
                             <!-- Date -->
                             <div class="space-y-2">
                                 <label class="block text-black font-medium">تاریخ رزرو *</label>
-                                <input type="date" id="date" required
+                                <input type="date" id="date" name="date" required
                                        class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                             </div>
 
                             <!-- Time -->
                             <div class="space-y-2">
                                 <label class="block text-black font-medium">ساعت رزرو *</label>
-                                <select id="time" required
+                                <select id="time" name="time" required
                                         class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                                     <option value="">ساعت را انتخاب کنید</option>
                                     <option value="08:00">08:00</option>
@@ -187,7 +190,7 @@
                         <!-- Notes -->
                         <div class="space-y-2">
                             <label class="block text-black font-medium">توضیحات اضافی</label>
-                            <textarea id="notes" rows="4"
+                            <textarea id="notes" name="notes" rows="4"
                                       placeholder="در صورت نیاز، توضیحات تکمیلی درباره مشکل خودرو را بنویسید..."
                                       class="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors resize-none"></textarea>
                         </div>
@@ -202,6 +205,17 @@
                             پس از ثبت رزرو، کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت
                         </p>
                     </form>
+                    
+                    <!-- Success Message -->
+                    <div id="success-message" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                        <div class="flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-green-800 mb-2">رزرو با موفقیت ثبت شد!</h3>
+                        <p class="text-green-600">کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -311,6 +325,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="content-manager.js"></script>
 </body>
 </html>
