@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="firebase-init.js"></script>
+    <!-- Primary Meta Tags -->
+    <title>رزرو وقت تعمیرگاه ماکسیما هوم یزد | تعمیر خودروهای چینی، ژاپنی، کره‌ای و اروپایی</title>
+    <meta name="title" content="رزرو وقت تعمیرگاه ماکسیما هوم یزد | تعمیر خودروهای چینی، ژاپنی، کره‌ای و اروپایی">
+    <meta name="description" content="رزرو آنلاین وقت تعمیر خودرو در یزد - تعمیرگاه ماکسیما هوم متخصص تعمیر خودروهای چینی، ژاپنی، کره‌ای، اروپایی و هیبرید">
+    <meta name="keywords" content="رزرو وقت تعمیرگاه یزد, رزرو تعمیر خودرو چینی یزد, رزرو تعمیر خودرو ژاپنی یزد, رزرو تعمیر خودرو کره‌ای یزد, رزرو تعمیر خودرو اروپایی یزد, رزرو تعمیر هیبرید یزد, ماکسیما هوم یزد">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://maximahome.ir/booking.html">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-white text-black">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="flex flex-col items-center gap-3">
+            <!-- Minimal Wrench Loader -->
+            <svg class="w-10 h-10 text-black animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            </svg>
+            <span class="text-xs text-black/50">در حال بارگذاری</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="text-black hover:opacity-70 transition-opacity">
+                    <span class="text-2xl font-medium">ماکسیما هوم</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="index.html#home" class="nav-link">صفحه اصلی</a>
+                    <a href="index.html#services" class="nav-link">خدمات</a>
+                    <a href="index.html#gallery" class="nav-link">گالری</a>
+                    <a href="index.html#about" class="nav-link">درباره ما</a>
+                    <a href="index.html#contact" class="nav-link">تماس</a>
+                </nav>
+
+                <!-- CTA Button -->
+                <div class="hidden md:block">
+                    <a href="booking.html" class="bg-black text-white hover:bg-black/80 px-6 py-2 rounded-lg transition-colors font-medium">
+                        رزرو وقت
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="menu-button" class="md:hidden text-black" onclick="toggleMobileMenu()" aria-controls="mobile-menu" aria-expanded="false">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Backdrop -->
+        <div id="mobile-menu-backdrop" onclick="toggleMobileMenu()"></div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden">
+            <div class="px-6 py-8 space-y-6">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-medium text-black">منو</h3>
+                    <button onclick="toggleMobileMenu()" class="text-black hover:opacity-70">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <a href="index.html#home" onclick="toggleMobileMenu();" class="mobile-nav-link block w-full text-right py-3 px-4 rounded-lg hover:bg-black/5 transition-colors">صفحه اصلی</a>
+                <a href="index.html#services" onclick="toggleMobileMenu();" class="mobile-nav-link block w-full text-right py-3 px-4 rounded-lg hover:bg-black/5 transition-colors">خدمات</a>
+                <a href="index.html#gallery" onclick="toggleMobileMenu();" class="mobile-nav-link block w-full text-right py-3 px-4 rounded-lg hover:bg-black/5 transition-colors">گالری</a>
+                <a href="index.html#about" onclick="toggleMobileMenu();" class="mobile-nav-link block w-full text-right py-3 px-4 rounded-lg hover:bg-black/5 transition-colors">درباره ما</a>
+                <a href="index.html#contact" onclick="toggleMobileMenu();" class="mobile-nav-link block w-full text-right py-3 px-4 rounded-lg hover:bg-black/5 transition-colors">تماس</a>
+                
+                <div class="pt-4 border-t border-black/10">
+                    <a href="booking.html" onclick="toggleMobileMenu();" class="w-full bg-black text-white hover:bg-black/80 px-6 py-3 rounded-lg transition-colors font-medium block text-center">
+                        رزرو وقت
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Booking Section -->
+        <section class="py-24 bg-black/[0.02] pt-32">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl lg:text-5xl text-black mb-4 font-medium">
+                        رزرو وقت
+                    </h1>
+                    <p class="text-xl text-black/60">
+                        وقت خود را به راحتی رزرو کنید
+                    </p>
+                </div>
+
+                <!-- Booking Form -->
+                <div class="bg-white p-8 lg:p-10 rounded-3xl border border-black/5 shadow-xl">
+                    <form id="booking-form" class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Name -->
+                            <div class="space-y-2">
+                                <label class="block text-black font-medium">نام و نام خانوادگی *</label>
+                                <input type="text" id="name" required
+                                       placeholder="نام خود را وارد کنید"
+                                       class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="space-y-2">
+                                <label class="block text-black font-medium">شماره تماس *</label>
+                                <input type="tel" id="phone" required
+                                       placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                                       class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                            </div>
+                        </div>
+
+                        <!-- Car Model -->
+                        <div class="space-y-2">
+                            <label class="block text-black font-medium">مدل خودرو</label>
+                            <input type="text" id="carModel"
+                                   placeholder="مثال: پژو ۲۰۶"
+                                   class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                        </div>
+
+                        <!-- Service Type -->
+                        <div class="space-y-2">
+                            <label class="block text-black font-medium">نوع خدمات *</label>
+                            <select id="service" required
+                                    class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                <option value="">نوع خدمات را انتخاب کنید</option>
+                                <option value="تعمیرات موتور">تعمیرات موتور</option>
+                                <option value="تعمیرات گیربکس">تعمیرات گیربکس</option>
+                                <option value="سرویس و تعویض روغن">سرویس و تعویض روغن</option>
+                                <option value="سیستم برق خودرو">سیستم برق خودرو</option>
+                                <option value="تعمیرات جلوبندی">تعمیرات جلوبندی</option>
+                                <option value="خدمات اورژانسی">خدمات اورژانسی</option>
+                                <option value="سایر موارد">سایر موارد</option>
+                            </select>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Date -->
+                            <div class="space-y-2">
+                                <label class="block text-black font-medium">تاریخ رزرو *</label>
+                                <input type="date" id="date" required
+                                       class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                            </div>
+
+                            <!-- Time -->
+                            <div class="space-y-2">
+                                <label class="block text-black font-medium">ساعت رزرو *</label>
+                                <select id="time" required
+                                        class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                    <option value="">ساعت را انتخاب کنید</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="09:00">09:00</option>
+                                    <option value="10:00">10:00</option>
+                                    <option value="11:00">11:00</option>
+                                    <option value="12:00">12:00</option>
+                                    <option value="13:00">13:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option>
+                                    <option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:00">18:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="space-y-2">
+                            <label class="block text-black font-medium">توضیحات اضافی</label>
+                            <textarea id="notes" rows="4"
+                                      placeholder="در صورت نیاز، توضیحات تکمیلی درباره مشکل خودرو را بنویسید..."
+                                      class="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors resize-none"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit"
+                                class="w-full bg-black text-white hover:bg-black/80 h-12 rounded-lg transition-colors font-medium">
+                            ثبت رزرو
+                        </button>
+
+                        <p class="text-black/60 text-center">
+                            پس از ثبت رزرو، کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <!-- Brand -->
+                <div>
+                    <h3 class="text-2xl mb-4 font-medium">ماکسیما هوم</h3>
+                    <p class="text-white/60 leading-relaxed">
+                        تعمیرگاه تخصصی خودرو با بیش از ۱۵ سال تجربه
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="mb-4 font-medium">لینک‌های سریع</h4>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="index.html#home" class="text-white/60 hover:text-white transition-colors">
+                                صفحه اصلی
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#services" class="text-white/60 hover:text-white transition-colors">
+                                خدمات
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#about" class="text-white/60 hover:text-white transition-colors">
+                                درباره ما
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#contact" class="text-white/60 hover:text-white transition-colors">
+                                تماس با ما
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="mb-4 font-medium">تماس</h4>
+                    <ul class="space-y-2 text-white/60">
+                        <li>تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</li>
+                        <li>موبایل: ۰۹۱۲۳۴۵۶۷۸۹</li>
+                        <li>ایمیل: info@maximahome.ir</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-white/60">
+                    © <span id="current-year"></span> ماکسیما هوم. تمامی حقوق محفوظ است.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav id="bottom-nav" class="md:hidden">
+        <a href="index.html#home" class="bottom-nav-item" aria-label="خانه">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 11l9-7 9 7"/>
+                <path d="M9 22V12h6v10"/>
+            </svg>
+            <span>خانه</span>
+        </a>
+        <a href="index.html#services" class="bottom-nav-item" aria-label="خدمات">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.04 3.4l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 9 2.28V2a2 2 0 1 1 4 0v.09c0 .66.38 1.26.98 1.54.57.27 1.24.22 1.78-.14l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06c-.36.54-.41 1.21-.14 1.78.28.6.88.98 1.54.98H22a2 2 0 1 1 0 4h-.09c-.66 0-1.26.38-1.54.98z"/>
+            </svg>
+            <span>خدمات</span>
+        </a>
+        <a href="index.html#gallery" class="bottom-nav-item" aria-label="گالری">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 15l4-4a2 2 0 0 1 3 0l6 6"/>
+                <path d="M14 14l1-1a2 2 0 0 1 3 0l3 3"/>
+            </svg>
+            <span>گالری</span>
+        </a>
+        <a href="index.html#about" class="bottom-nav-item" aria-label="درباره">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="7" r="4"/>
+                <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
+            </svg>
+            <span>درباره</span>
+        </a>
+        <a href="index.html#contact" class="bottom-nav-item" aria-label="تماس">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>تماس</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden transition-all">
+        <p id="toast-message"></p>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="content-manager.js"></script>
+</body>
+</html>

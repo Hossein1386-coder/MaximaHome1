@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://maximahome.ir/sitemap.xml
+
+# Disallow admin panel from search engines
+Disallow: /admin/
+
+# Allow all other content
+Allow: /booking.html
+Allow: /style.css
+Allow: /script.js
+Allow: /content-manager.js

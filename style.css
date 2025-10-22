@@ -1,0 +1,254 @@
+/* Custom Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Navigation Links */
+.nav-link {
+    transition: color 0.3s;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.nav-link:hover {
+    color: rgba(0, 0, 0, 1);
+}
+
+.nav-link.active {
+    color: rgba(0, 0, 0, 1);
+}
+
+.mobile-nav-link {
+    color: rgba(0, 0, 0, 0.5);
+    transition: color 0.3s;
+}
+
+.mobile-nav-link:hover {
+    color: rgba(0, 0, 0, 1);
+}
+
+/* Form Inputs */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Toast Animation */
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+    to {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+}
+
+#toast.show {
+    display: block;
+    animation: slideDown 0.3s ease-out;
+}
+
+#toast.hide {
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Mobile Menu Slide Animation */
+#mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -50%;
+    width: 50%;
+    height: 100vh;
+    background: white;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#mobile-menu.show {
+    left: 0;
+}
+
+#mobile-menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+#mobile-menu-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Bottom Navigation (Mobile) */
+#bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    padding: 8px env(safe-area-inset-right) calc(8px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    z-index: 60;
+}
+
+/* Hide bottom nav when side menu is open */
+body.menu-open #bottom-nav {
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
+/* Body padding to avoid bottom nav overlap on mobile */
+@media (max-width: 767px) {
+    body {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    }
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 56px;
+    color: rgba(0, 0, 0, 0.6);
+    background: transparent;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.bottom-nav-item .icon {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+}
+
+.bottom-nav-item.active,
+.bottom-nav-item:hover {
+    color: rgba(0, 0, 0, 1);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 768px) {
+    #bottom-nav { display: none; }
+}
+
+/* Loading Screen Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes logoGlow {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+}
+
+@keyframes spinnerPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+#loading-screen {
+    animation: fadeIn 0.5s ease-out;
+}
+
+#loading-screen.fade-out {
+    animation: fadeOut 0.5s ease-in forwards;
+}
+
+#loading-screen .animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Backdrop Blur Support */
+@supports ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+    header {
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+    }
+}
