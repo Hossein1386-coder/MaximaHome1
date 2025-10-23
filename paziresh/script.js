@@ -829,6 +829,427 @@ function viewInvoice(invoiceId) {
     modal.classList.remove('hidden');
 }
 
+// Print invoice function
+function printInvoice(invoiceData) {
+    const printWindow = window.open('', '_blank');
+    
+    const printContent = `
+        <!DOCTYPE html>
+        <html dir="rtl" lang="fa">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>فاکتور ${invoiceData.invoiceNumber}</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    font-family: 'Tahoma', 'Arial', sans-serif;
+                    direction: rtl;
+                    text-align: right;
+                    background: #f8f9fa;
+                    color: #2c3e50;
+                    line-height: 1.6;
+                }
+                
+                .invoice-container {
+                    max-width: 800px;
+                    margin: 20px auto;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                    overflow: hidden;
+                }
+                
+                .invoice-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                    position: relative;
+                }
+                
+                .invoice-header::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                    opacity: 0.3;
+                }
+                
+                .invoice-header h1 {
+                    font-size: 32px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .invoice-number {
+                    font-size: 18px;
+                    opacity: 0.9;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .invoice-date {
+                    font-size: 16px;
+                    opacity: 0.8;
+                    margin-top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .invoice-body {
+                    padding: 40px;
+                }
+                
+                .info-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    margin-bottom: 40px;
+                }
+                
+                .info-card {
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    padding: 20px;
+                    border-right: 4px solid #667eea;
+                    transition: transform 0.2s ease;
+                }
+                
+                .info-card:hover {
+                    transform: translateY(-2px);
+                }
+                
+                .info-card h3 {
+                    color: #667eea;
+                    font-size: 18px;
+                    margin-bottom: 15px;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .info-card h3::before {
+                    content: '●';
+                    margin-left: 8px;
+                    color: #667eea;
+                }
+                
+                .info-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }
+                
+                .info-item:last-child {
+                    border-bottom: none;
+                }
+                
+                .info-label {
+                    font-weight: 600;
+                    color: #495057;
+                    font-size: 14px;
+                }
+                
+                .info-value {
+                    color: #2c3e50;
+                    font-weight: 500;
+                    font-size: 14px;
+                }
+                
+                .service-details {
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-bottom: 30px;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .service-details::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    right: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    animation: shimmer 3s infinite;
+                }
+                
+                @keyframes shimmer {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                .service-details h3 {
+                    font-size: 20px;
+                    margin-bottom: 15px;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .service-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px 0;
+                    border-bottom: 1px solid rgba(255,255,255,0.2);
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .service-item:last-child {
+                    border-bottom: none;
+                }
+                
+                .service-label {
+                    font-weight: 600;
+                    opacity: 0.9;
+                }
+                
+                .service-value {
+                    font-weight: 500;
+                }
+                
+                .total-section {
+                    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                    color: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .total-section::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+                    opacity: 0.3;
+                }
+                
+                .total-amount {
+                    font-size: 28px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .total-status {
+                    font-size: 16px;
+                    opacity: 0.9;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .status-badge {
+                    display: inline-block;
+                    padding: 6px 16px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    margin-top: 10px;
+                }
+                
+                .status-paid {
+                    background: rgba(40, 167, 69, 0.2);
+                    color: #28a745;
+                    border: 1px solid rgba(40, 167, 69, 0.3);
+                }
+                
+                .status-unpaid {
+                    background: rgba(220, 53, 69, 0.2);
+                    color: #dc3545;
+                    border: 1px solid rgba(220, 53, 69, 0.3);
+                }
+                
+                .footer {
+                    background: #2c3e50;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    font-size: 14px;
+                    opacity: 0.8;
+                }
+                
+                .buttons {
+                    text-align: center;
+                    margin-top: 30px;
+                    padding: 20px;
+                }
+                
+                .btn {
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    border: none;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    margin: 0 10px;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: inline-block;
+                }
+                
+                .btn-primary {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                }
+                
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+                }
+                
+                .btn-secondary {
+                    background: #6c757d;
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+                }
+                
+                .btn-secondary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+                }
+                
+                @media print {
+                    body { 
+                        background: white; 
+                        margin: 0; 
+                    }
+                    .invoice-container {
+                        box-shadow: none;
+                        margin: 0;
+                        border-radius: 0;
+                    }
+                    .no-print { display: none; }
+                    .info-card:hover { transform: none; }
+                    .btn:hover { transform: none; }
+                }
+                
+                @media (max-width: 768px) {
+                    .info-grid {
+                        grid-template-columns: 1fr;
+                        gap: 20px;
+                    }
+                    .invoice-body {
+                        padding: 20px;
+                    }
+                    .invoice-header {
+                        padding: 20px;
+                    }
+                    .invoice-header h1 {
+                        font-size: 24px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="invoice-container">
+                <div class="invoice-header">
+                    <h1>فاکتور</h1>
+                    <div class="invoice-number">شماره: ${invoiceData.invoiceNumber}</div>
+                    <div class="invoice-date">تاریخ: ${new Date(invoiceData.date).toLocaleDateString('fa-IR')}</div>
+                </div>
+                
+                <div class="invoice-body">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>اطلاعات مشتری</h3>
+                            <div class="info-item">
+                                <span class="info-label">نام:</span>
+                                <span class="info-value">${invoiceData.customer?.name || 'نامشخص'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">تلفن:</span>
+                                <span class="info-value">${invoiceData.customer?.phone || 'ثبت نشده'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <h3>اطلاعات خودرو</h3>
+                            <div class="info-item">
+                                <span class="info-label">نوع:</span>
+                                <span class="info-value">${invoiceData.vehicle?.type || 'نامشخص'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">مدل:</span>
+                                <span class="info-value">${invoiceData.vehicle?.model || 'نامشخص'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">پلاک:</span>
+                                <span class="info-value">${invoiceData.vehicle?.plate || 'ثبت نشده'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-details">
+                        <h3>جزئیات سرویس</h3>
+                        <div class="service-item">
+                            <span class="service-label">نوع سرویس:</span>
+                            <span class="service-value">${invoiceData.service?.type || 'نامشخص'}</span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-label">توضیحات:</span>
+                            <span class="service-value">${invoiceData.service?.description || 'توضیحی ثبت نشده'}</span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-label">تاریخ پذیرش:</span>
+                            <span class="service-value">${invoiceData.service?.admissionDate || 'نامشخص'}</span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-label">ساعت پذیرش:</span>
+                            <span class="service-value">${invoiceData.service?.admissionTime || 'نامشخص'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="total-section">
+                        <div class="total-amount">${(invoiceData.service?.actualCost || 0).toLocaleString()} تومان</div>
+                        <div class="total-status">مبلغ کل</div>
+                        <div class="status-badge ${invoiceData.status === 'پرداخت شده' ? 'status-paid' : 'status-unpaid'}">
+                            ${invoiceData.status}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>تعمیرگاه ماکسیما هوم - سیستم پذیرش خودرو</p>
+                    <p>این فاکتور به صورت خودکار تولید شده است</p>
+                </div>
+            </div>
+            
+            <div class="buttons no-print">
+                <button class="btn btn-primary" onclick="window.print()">🖨️ چاپ فاکتور</button>
+                <button class="btn btn-secondary" onclick="window.close()">❌ بستن</button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+}
+
 function closeInvoiceModal() {
     const modal = document.getElementById('invoice-modal');
     modal.classList.add('hidden');

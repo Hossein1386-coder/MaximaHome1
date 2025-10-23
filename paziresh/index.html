@@ -192,18 +192,18 @@
                     </p>
                 </div>
                 
-                    <!-- Quick Actions -->
+                <!-- Quick Actions -->
                     <div class="flex justify-center gap-6 mb-8">
                         <button onclick="showNewAdmission()" class="bg-blue-600 text-white hover:bg-blue-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
                             پذیرش جدید
-                        </button>
+                            </button>
                         <button onclick="showAllAdmissions()" class="bg-orange-600 text-white hover:bg-orange-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
                             مدیریت پذیرش‌ها
-                        </button>
+                            </button>
                         <button onclick="showInvoices()" class="bg-purple-600 text-white hover:bg-purple-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
                             مدیریت فاکتورها
-                        </button>
-                    </div>
+                            </button>
+                </div>
             </div>
         </section>
 
@@ -430,6 +430,10 @@
                         <!-- محتوای فاکتور اینجا نمایش داده می‌شود -->
                     </div>
                     <div class="flex gap-4 mt-6">
+                        <button onclick="printInvoice(window.currentViewingInvoice)" 
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            چاپ فاکتور
+                        </button>
                         <button onclick="closeInvoiceModal()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
                             بستن
                         </button>
