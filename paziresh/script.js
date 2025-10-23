@@ -97,7 +97,7 @@ async function deleteInvoiceFromFirebase(invoiceId) {
 
 // Security credentials for Firebase Auth
 const ADMIN_EMAIL = 'admin@maximahome.com';
-const ADMIN_PASSWORD = 'samad2024';
+const ADMIN_PASSWORD = 'samad1379';
 
 // Current step for multi-step form
 let currentStep = 1;
