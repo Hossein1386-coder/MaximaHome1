@@ -903,61 +903,47 @@ function generateInvoiceNumber() {
 
 
 
-// Login system
-function handleLogin(e) {
+// Login system with Firebase Authentication
+async function handleLogin(e) {
     e.preventDefault();
     
-    const username = document.getElementById('username').value;
+    const email = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
-    // Check if account is locked
-    if (isLocked) {
-        const currentTime = Date.now();
-        const lockDuration = 15 * 60 * 1000; // 15 minutes
-        
-        if (currentTime - lockTime < lockDuration) {
-            showToast('حساب کاربری قفل شده است. لطفاً بعداً تلاش کنید.', 'error');
-            return;
-        } else {
-            // Unlock account
-            isLocked = false;
-            loginAttempts = 0;
-            localStorage.removeItem('isLocked');
-            localStorage.removeItem('lockTime');
-            localStorage.removeItem('loginAttempts');
-        }
-    }
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'در حال ورود...';
+    submitBtn.disabled = true;
     
-    // Validate credentials
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-        // Successful login
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('loginTime', Date.now().toString());
-        loginAttempts = 0;
-        localStorage.removeItem('loginAttempts');
+    try {
+        // Sign in with Firebase
+        const { signInWithEmailAndPassword } = window.firebase;
+        await signInWithEmailAndPassword(window.firebase.auth, email, password);
         
+        // Successful login
         showMainContent();
         showToast('ورود موفقیت‌آمیز', 'success');
-    } else {
-        // Failed login
-        loginAttempts++;
-        localStorage.setItem('loginAttempts', loginAttempts.toString());
         
-        if (loginAttempts >= 3) {
-            // Lock account
-            isLocked = true;
-            lockTime = Date.now();
-            localStorage.setItem('isLocked', 'true');
-            localStorage.setItem('lockTime', lockTime.toString());
-            
-            document.getElementById('login-attempts').classList.add('hidden');
-            document.getElementById('locked-message').classList.remove('hidden');
-            showToast('حساب کاربری به دلیل تلاش‌های ناموفق قفل شد', 'error');
-        } else {
-            document.getElementById('login-attempts').classList.remove('hidden');
-            document.getElementById('attempts-count').textContent = loginAttempts;
-            showToast('نام کاربری یا رمز عبور اشتباه است', 'error');
+    } catch (error) {
+        console.error('Login error:', error);
+        
+        let errorMessage = 'خطا در ورود';
+        if (error.code === 'auth/user-not-found') {
+            errorMessage = 'کاربری با این ایمیل یافت نشد';
+        } else if (error.code === 'auth/wrong-password') {
+            errorMessage = 'رمز عبور اشتباه است';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'ایمیل نامعتبر است';
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = 'تعداد تلاش‌های ناموفق زیاد است. لطفاً بعداً تلاش کنید';
         }
+        
+        showToast(errorMessage, 'error');
+    } finally {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 }
 
@@ -968,23 +954,23 @@ function showMainContent() {
 }
 
 function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const loginTime = localStorage.getItem('loginTime');
-    const sessionDuration = 8 * 60 * 60 * 1000; // 8 hours
-    
-    if (isLoggedIn && loginTime) {
-        const currentTime = Date.now();
-        if (currentTime - parseInt(loginTime) < sessionDuration) {
-        showMainContent();
-            return;
-    } else {
-            // Session expired
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('loginTime');
-    }
+    // Wait for Firebase to be available
+    if (!window.firebase) {
+        setTimeout(checkLoginStatus, 100);
+        return;
     }
     
-    showLoginForm();
+    // Check Firebase auth state
+    const { onAuthStateChanged } = window.firebase;
+    onAuthStateChanged(window.firebase.auth, (user) => {
+        if (user) {
+            // User is signed in
+            showMainContent();
+        } else {
+            // User is signed out
+            showLoginForm();
+        }
+    });
 }
 
 function showLoginForm() {
@@ -992,11 +978,16 @@ function showLoginForm() {
     document.getElementById('main-content').classList.add('hidden');
 }
 
-function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('loginTime');
-    showLoginForm();
-    showToast('خروج موفقیت‌آمیز', 'success');
+async function logout() {
+    try {
+        const { signOut } = window.firebase;
+        await signOut(window.firebase.auth);
+        showLoginForm();
+        showToast('خروج موفقیت‌آمیز', 'success');
+    } catch (error) {
+        console.error('Logout error:', error);
+        showToast('خطا در خروج', 'error');
+    }
 }
 
 // Initialize application
