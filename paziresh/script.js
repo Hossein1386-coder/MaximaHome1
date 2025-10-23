@@ -11,6 +11,15 @@ const INVOICES_COLLECTION = 'invoices';
 // Firebase Functions
 async function loadAdmissionsFromFirebase() {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, collection, getDocs, query, orderBy } = window.firebase;
         const admissionsRef = collection(db, ADMISSIONS_COLLECTION);
         const q = query(admissionsRef, orderBy('date', 'desc'));
@@ -24,13 +33,22 @@ async function loadAdmissionsFromFirebase() {
         return admissionsData;
     } catch (error) {
         console.error('Error loading admissions:', error);
-        showToast('خطا در بارگذاری پذیرش‌ها', 'error');
+        showToast('خطا در بارگذاری پذیرش‌ها. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         return [];
     }
 }
 
 async function loadInvoicesFromFirebase() {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, collection, getDocs, query, orderBy } = window.firebase;
         const invoicesRef = collection(db, INVOICES_COLLECTION);
         const q = query(invoicesRef, orderBy('date', 'desc'));
@@ -44,53 +62,89 @@ async function loadInvoicesFromFirebase() {
         return invoicesData;
     } catch (error) {
         console.error('Error loading invoices:', error);
-        showToast('خطا در بارگذاری فاکتورها', 'error');
+        showToast('خطا در بارگذاری فاکتورها. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         return [];
     }
 }
 
 async function saveAdmissionToFirebase(admissionData) {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, collection, addDoc } = window.firebase;
         const docRef = await addDoc(collection(db, ADMISSIONS_COLLECTION), admissionData);
         return docRef.id;
     } catch (error) {
         console.error('Error saving admission:', error);
-        showToast('خطا در ذخیره پذیرش', 'error');
+        showToast('خطا در ذخیره پذیرش. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         throw error;
     }
 }
 
 async function saveInvoiceToFirebase(invoiceData) {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, collection, addDoc } = window.firebase;
         const docRef = await addDoc(collection(db, INVOICES_COLLECTION), invoiceData);
         return docRef.id;
     } catch (error) {
         console.error('Error saving invoice:', error);
-        showToast('خطا در ذخیره فاکتور', 'error');
+        showToast('خطا در ذخیره فاکتور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         throw error;
     }
 }
 
 async function deleteAdmissionFromFirebase(admissionId) {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, doc, deleteDoc } = window.firebase;
         await deleteDoc(doc(db, ADMISSIONS_COLLECTION, admissionId));
     } catch (error) {
         console.error('Error deleting admission:', error);
-        showToast('خطا در حذف پذیرش', 'error');
+        showToast('خطا در حذف پذیرش. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         throw error;
     }
 }
 
 async function deleteInvoiceFromFirebase(invoiceId) {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
         const { db, doc, deleteDoc } = window.firebase;
         await deleteDoc(doc(db, INVOICES_COLLECTION, invoiceId));
     } catch (error) {
         console.error('Error deleting invoice:', error);
-        showToast('خطا در حذف فاکتور', 'error');
+        showToast('خطا در حذف فاکتور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
         throw error;
     }
 }
@@ -1133,18 +1187,168 @@ function printInvoice(invoiceData) {
                 }
                 
                 @media print {
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
                     body { 
-                        background: white; 
-                        margin: 0; 
+                        background: white !important; 
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        font-size: 12px !important;
+                        line-height: 1.4 !important;
                     }
+                    
                     .invoice-container {
-                        box-shadow: none;
-                        margin: 0;
-                        border-radius: 0;
+                        box-shadow: none !important;
+                        margin: 0 !important;
+                        border-radius: 0 !important;
+                        max-width: none !important;
+                        width: 100% !important;
+                        page-break-inside: avoid !important;
                     }
-                    .no-print { display: none; }
-                    .info-card:hover { transform: none; }
-                    .btn:hover { transform: none; }
+                    
+                    .invoice-header {
+                        background: #2c3e50 !important;
+                        color: white !important;
+                        padding: 15px !important;
+                        margin-bottom: 15px !important;
+                        page-break-after: avoid !important;
+                    }
+                    
+                    .invoice-header h1 {
+                        font-size: 20px !important;
+                        margin-bottom: 5px !important;
+                    }
+                    
+                    .invoice-number, .invoice-date {
+                        font-size: 12px !important;
+                    }
+                    
+                    .invoice-body {
+                        padding: 15px !important;
+                    }
+                    
+                    .info-grid {
+                        grid-template-columns: 1fr 1fr !important;
+                        gap: 15px !important;
+                        margin-bottom: 15px !important;
+                    }
+                    
+                    .info-card {
+                        background: #f8f9fa !important;
+                        border: 1px solid #dee2e6 !important;
+                        border-right: 3px solid #2c3e50 !important;
+                        padding: 10px !important;
+                        page-break-inside: avoid !important;
+                    }
+                    
+                    .info-card h3 {
+                        color: #2c3e50 !important;
+                        font-size: 14px !important;
+                        margin-bottom: 8px !important;
+                    }
+                    
+                    .info-item {
+                        padding: 3px 0 !important;
+                        font-size: 11px !important;
+                    }
+                    
+                    .info-label {
+                        color: #495057 !important;
+                        font-weight: 600 !important;
+                    }
+                    
+                    .info-value {
+                        color: #2c3e50 !important;
+                    }
+                    
+                    .service-details {
+                        background: #2c3e50 !important;
+                        color: white !important;
+                        padding: 15px !important;
+                        margin-bottom: 15px !important;
+                        page-break-inside: avoid !important;
+                    }
+                    
+                    .service-details::before {
+                        display: none !important;
+                    }
+                    
+                    .service-details h3 {
+                        font-size: 16px !important;
+                        margin-bottom: 10px !important;
+                    }
+                    
+                    .service-item {
+                        padding: 5px 0 !important;
+                        font-size: 11px !important;
+                        border-bottom: 1px solid rgba(255,255,255,0.2) !important;
+                    }
+                    
+                    .total-section {
+                        background: #34495e !important;
+                        color: white !important;
+                        padding: 15px !important;
+                        page-break-inside: avoid !important;
+                    }
+                    
+                    .total-section::before {
+                        display: none !important;
+                    }
+                    
+                    .total-amount {
+                        font-size: 18px !important;
+                        margin-bottom: 5px !important;
+                    }
+                    
+                    .total-status {
+                        font-size: 12px !important;
+                    }
+                    
+                    .status-badge {
+                        font-size: 10px !important;
+                        padding: 3px 8px !important;
+                        margin-top: 5px !important;
+                    }
+                    
+                    .status-paid {
+                        background: #27ae60 !important;
+                        color: white !important;
+                        border: 1px solid #27ae60 !important;
+                    }
+                    
+                    .status-unpaid {
+                        background: #e74c3c !important;
+                        color: white !important;
+                        border: 1px solid #e74c3c !important;
+                    }
+                    
+                    .footer {
+                        background: #2c3e50 !important;
+                        color: white !important;
+                        padding: 10px !important;
+                        font-size: 10px !important;
+                        page-break-before: avoid !important;
+                    }
+                    
+                    .no-print { 
+                        display: none !important; 
+                    }
+                    
+                    .info-card:hover { 
+                        transform: none !important; 
+                    }
+                    
+                    .btn:hover { 
+                        transform: none !important; 
+                    }
+                    
+                    @page {
+                        margin: 0.5in !important;
+                        size: A4 !important;
+                    }
                 }
                 
                 @media (max-width: 768px) {
@@ -1338,7 +1542,16 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
-        // Sign in with Firebase
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
+        // Use Firebase authentication
         const { signInWithEmailAndPassword } = window.firebase;
         await signInWithEmailAndPassword(window.firebase.auth, email, password);
         
@@ -1358,6 +1571,8 @@ async function handleLogin(e) {
             errorMessage = 'ایمیل نامعتبر است';
         } else if (error.code === 'auth/too-many-requests') {
             errorMessage = 'تعداد تلاش‌های ناموفق زیاد است. لطفاً بعداً تلاش کنید';
+        } else if (error.message === 'Firebase not available') {
+            errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید';
         }
         
         showToast(errorMessage, 'error');
@@ -1377,20 +1592,21 @@ function showMainContent() {
 function checkLoginStatus() {
     // Wait for Firebase to be available
     if (!window.firebase) {
-        setTimeout(checkLoginStatus, 100);
+        console.log('Waiting for Firebase to initialize...');
+        setTimeout(checkLoginStatus, 1000);
         return;
     }
     
-    // Check Firebase auth state
+    // Use Firebase authentication
     const { onAuthStateChanged } = window.firebase;
     onAuthStateChanged(window.firebase.auth, (user) => {
         if (user) {
             // User is signed in
-        showMainContent();
-    } else {
+            showMainContent();
+        } else {
             // User is signed out
-        showLoginForm();
-    }
+            showLoginForm();
+        }
     });
 }
 
@@ -1401,10 +1617,20 @@ function showLoginForm() {
 
 async function logout() {
     try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        
+        // Use Firebase authentication
         const { signOut } = window.firebase;
         await signOut(window.firebase.auth);
-    showLoginForm();
-    showToast('خروج موفقیت‌آمیز', 'success');
+        showLoginForm();
+        showToast('خروج موفقیت‌آمیز', 'success');
     } catch (error) {
         console.error('Logout error:', error);
         showToast('خطا در خروج', 'error');
