@@ -1,19 +1,103 @@
-// Paziresh System JavaScript
+// Paziresh System JavaScript with Firebase
 
 // Global variables for data storage
-let admissionsData = JSON.parse(localStorage.getItem('admissionsData')) || [];
-let invoicesData = JSON.parse(localStorage.getItem('invoicesData')) || [];
+let admissionsData = [];
+let invoicesData = [];
 
-// Security credentials
-const ADMIN_CREDENTIALS = {
-    username: 'admin',
-    password: 'samad'
-};
+// Firebase collections
+const ADMISSIONS_COLLECTION = 'admissions';
+const INVOICES_COLLECTION = 'invoices';
 
-// Security variables
-let loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
-let isLocked = localStorage.getItem('isLocked') === 'true';
-let lockTime = parseInt(localStorage.getItem('lockTime')) || 0;
+// Firebase Functions
+async function loadAdmissionsFromFirebase() {
+    try {
+        const { db, collection, getDocs, query, orderBy } = window.firebase;
+        const admissionsRef = collection(db, ADMISSIONS_COLLECTION);
+        const q = query(admissionsRef, orderBy('date', 'desc'));
+        const snapshot = await getDocs(q);
+        
+        admissionsData = [];
+        snapshot.forEach((doc) => {
+            admissionsData.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return admissionsData;
+    } catch (error) {
+        console.error('Error loading admissions:', error);
+        showToast('خطا در بارگذاری پذیرش‌ها', 'error');
+        return [];
+    }
+}
+
+async function loadInvoicesFromFirebase() {
+    try {
+        const { db, collection, getDocs, query, orderBy } = window.firebase;
+        const invoicesRef = collection(db, INVOICES_COLLECTION);
+        const q = query(invoicesRef, orderBy('date', 'desc'));
+        const snapshot = await getDocs(q);
+        
+        invoicesData = [];
+        snapshot.forEach((doc) => {
+            invoicesData.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return invoicesData;
+    } catch (error) {
+        console.error('Error loading invoices:', error);
+        showToast('خطا در بارگذاری فاکتورها', 'error');
+        return [];
+    }
+}
+
+async function saveAdmissionToFirebase(admissionData) {
+    try {
+        const { db, collection, addDoc } = window.firebase;
+        const docRef = await addDoc(collection(db, ADMISSIONS_COLLECTION), admissionData);
+        return docRef.id;
+    } catch (error) {
+        console.error('Error saving admission:', error);
+        showToast('خطا در ذخیره پذیرش', 'error');
+        throw error;
+    }
+}
+
+async function saveInvoiceToFirebase(invoiceData) {
+    try {
+        const { db, collection, addDoc } = window.firebase;
+        const docRef = await addDoc(collection(db, INVOICES_COLLECTION), invoiceData);
+        return docRef.id;
+    } catch (error) {
+        console.error('Error saving invoice:', error);
+        showToast('خطا در ذخیره فاکتور', 'error');
+        throw error;
+    }
+}
+
+async function deleteAdmissionFromFirebase(admissionId) {
+    try {
+        const { db, doc, deleteDoc } = window.firebase;
+        await deleteDoc(doc(db, ADMISSIONS_COLLECTION, admissionId));
+    } catch (error) {
+        console.error('Error deleting admission:', error);
+        showToast('خطا در حذف پذیرش', 'error');
+        throw error;
+    }
+}
+
+async function deleteInvoiceFromFirebase(invoiceId) {
+    try {
+        const { db, doc, deleteDoc } = window.firebase;
+        await deleteDoc(doc(db, INVOICES_COLLECTION, invoiceId));
+    } catch (error) {
+        console.error('Error deleting invoice:', error);
+        showToast('خطا در حذف فاکتور', 'error');
+        throw error;
+    }
+}
+
+// Security credentials for Firebase Auth
+const ADMIN_EMAIL = 'admin@maximahome.com';
+const ADMIN_PASSWORD = 'samad2024';
 
 // Current step for multi-step form
 let currentStep = 1;
@@ -35,8 +119,8 @@ function showToast(message, type = 'success') {
     toast.classList.remove('hidden');
     
     // Auto hide after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('hidden');
+        setTimeout(() => {
+            toast.classList.add('hidden');
     }, 3000);
 }
 
@@ -146,7 +230,7 @@ function validatePersianDate(dateString) {
 function hideLoadingScreen() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
-        loadingScreen.style.display = 'none';
+            loadingScreen.style.display = 'none';
     }
 }
 
@@ -224,7 +308,7 @@ function updateStatistics() {
 }
 
 // Form submission handler
-function handleFormSubmission(e) {
+async function handleFormSubmission(e) {
     e.preventDefault();
     
     const form = e.target;
@@ -250,22 +334,25 @@ function handleFormSubmission(e) {
     
     // Create admission record
     const admissionRecord = {
-        id: receiptNumber,
+        receiptNumber: receiptNumber,
         date: new Date().toISOString(),
         ...formattedData,
         status: 'ثبت شده'
     };
     
     try {
-        // Store in local storage
-        admissionsData.push(admissionRecord);
-        localStorage.setItem('admissionsData', JSON.stringify(admissionsData));
+        // Store in Firebase
+        const docId = await saveAdmissionToFirebase(admissionRecord);
+        
+        // Add to local array for immediate UI update
+        admissionsData.unshift({ id: docId, ...admissionRecord });
         
         // Show success message
         showToast(`پذیرش خودرو با شماره ${receiptNumber} ثبت شد.`, 'success');
         
         // Reset form
         form.reset();
+        setMinimumDate(); // Reset Persian date
         
         // Update statistics
         updateStatistics();
@@ -361,30 +448,37 @@ function validateCurrentStep() {
 }
 
 // Save as draft
-function saveAsDraft() {
+async function saveAsDraft() {
     const form = document.getElementById('car-admission-form');
     const formData = new FormData(form);
     const formattedData = formatFormData(formData);
     
     // Create draft record
     const draftRecord = {
-        id: 'DRAFT_' + Date.now(),
+        receiptNumber: 'DRAFT_' + Date.now(),
         date: new Date().toISOString(),
         ...formattedData,
         status: 'پیش‌نویس'
     };
     
-    admissionsData.push(draftRecord);
-    localStorage.setItem('admissionsData', JSON.stringify(admissionsData));
-    
-    showToast('پیش‌نویس با موفقیت ذخیره شد', 'success');
-    updateStatistics();
+    try {
+        const docId = await saveAdmissionToFirebase(draftRecord);
+        admissionsData.unshift({ id: docId, ...draftRecord });
+        
+        showToast('پیش‌نویس با موفقیت ذخیره شد', 'success');
+        updateStatistics();
+    } catch (error) {
+        showToast('خطا در ذخیره پیش‌نویس', 'error');
+    }
 }
 
 // Admissions management
-function showAllAdmissions() {
+async function showAllAdmissions() {
     hideAllSections();
     document.getElementById('all-admissions-section').classList.remove('hidden');
+    
+    // Load data from Firebase
+    await loadAdmissionsFromFirebase();
     updateAllAdmissionsList();
 }
 
@@ -497,17 +591,23 @@ function editAdmission(admissionId) {
 }
 
 // Delete admission
-function deleteAdmission(admissionId) {
+async function deleteAdmission(admissionId) {
     if (confirm('آیا مطمئن هستید که می‌خواهید این پذیرش را حذف کنید؟')) {
-        // Remove from admissions data
-        admissionsData = admissionsData.filter(a => a.id !== admissionId);
-        localStorage.setItem('admissionsData', JSON.stringify(admissionsData));
-        
-        // Update lists
-        updateAllAdmissionsList();
-        updateStatistics();
-        
-        showToast('پذیرش با موفقیت حذف شد', 'success');
+        try {
+            // Remove from Firebase
+            await deleteAdmissionFromFirebase(admissionId);
+            
+            // Remove from local array
+            admissionsData = admissionsData.filter(a => a.id !== admissionId);
+            
+            // Update lists
+            updateAllAdmissionsList();
+            updateStatistics();
+            
+            showToast('پذیرش با موفقیت حذف شد', 'success');
+        } catch (error) {
+            showToast('خطا در حذف پذیرش', 'error');
+        }
     }
 }
 
@@ -586,9 +686,12 @@ function updateAdmissionsList(admissions) {
 }
 
 // Invoice management
-function showInvoices() {
+async function showInvoices() {
     hideAllSections();
     document.getElementById('invoices-section').classList.remove('hidden');
+    
+    // Load data from Firebase
+    await loadInvoicesFromFirebase();
     updateInvoicesList();
 }
 
@@ -734,30 +837,36 @@ function closeInvoiceModal() {
 
 
 // Delete invoice
-function deleteInvoice(invoiceNumber) {
+async function deleteInvoice(invoiceId) {
     if (confirm('آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟')) {
-        // Remove from invoices data
-        invoicesData = invoicesData.filter(i => i.number !== invoiceNumber);
-        localStorage.setItem('invoicesData', JSON.stringify(invoicesData));
-        
-        // Update invoices list
-        updateInvoicesList();
-        
-        // Update statistics
-        updateStatistics();
-        
-        showToast('فاکتور با موفقیت حذف شد', 'success');
+        try {
+            // Remove from Firebase
+            await deleteInvoiceFromFirebase(invoiceId);
+            
+            // Remove from local array
+            invoicesData = invoicesData.filter(i => i.id !== invoiceId);
+            
+            // Update invoices list
+            updateInvoicesList();
+            
+            // Update statistics
+            updateStatistics();
+            
+            showToast('فاکتور با موفقیت حذف شد', 'success');
+        } catch (error) {
+            showToast('خطا در حذف فاکتور', 'error');
+        }
     }
 }
 
 // Generate invoice for admission
-function generateInvoiceForAdmission(admissionId) {
+async function generateInvoiceForAdmission(admissionId) {
     const admission = admissionsData.find(a => a.id === admissionId);
     if (!admission) return;
     
     const invoiceNumber = generateInvoiceNumber();
     const invoice = {
-        number: invoiceNumber,
+        invoiceNumber: invoiceNumber,
         date: new Date().toISOString(),
         customer: admission.customer,
         vehicle: admission.vehicle,
@@ -765,14 +874,20 @@ function generateInvoiceForAdmission(admissionId) {
         status: 'پرداخت نشده'
     };
     
-    // Save invoice
-    invoicesData.push(invoice);
-    localStorage.setItem('invoicesData', JSON.stringify(invoicesData));
-    
-    // Update statistics
-    updateStatistics();
-    
-    showToast(`فاکتور ${invoiceNumber} تولید شد`, 'success');
+    try {
+        // Save invoice to Firebase
+        const docId = await saveInvoiceToFirebase(invoice);
+        
+        // Add to local array
+        invoicesData.unshift({ id: docId, ...invoice });
+        
+        // Update statistics
+        updateStatistics();
+        
+        showToast(`فاکتور ${invoiceNumber} تولید شد`, 'success');
+    } catch (error) {
+        showToast('خطا در تولید فاکتور', 'error');
+    }
 }
 
 // Generate invoice number
@@ -860,13 +975,13 @@ function checkLoginStatus() {
     if (isLoggedIn && loginTime) {
         const currentTime = Date.now();
         if (currentTime - parseInt(loginTime) < sessionDuration) {
-            showMainContent();
+        showMainContent();
             return;
-        } else {
+    } else {
             // Session expired
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('loginTime');
-        }
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loginTime');
+    }
     }
     
     showLoginForm();
@@ -885,8 +1000,23 @@ function logout() {
 }
 
 // Initialize application
-function initializeApp() {
+async function initializeApp() {
+    // Wait for Firebase to be available
+    if (!window.firebase) {
+        setTimeout(initializeApp, 100);
+        return;
+    }
+    
     checkLoginStatus();
+    
+    // Load initial data from Firebase
+    try {
+        await loadAdmissionsFromFirebase();
+        await loadInvoicesFromFirebase();
+        updateStatistics();
+    } catch (error) {
+        console.error('Error loading initial data:', error);
+    }
     
     // Set up form event listeners
     const form = document.getElementById('car-admission-form');
