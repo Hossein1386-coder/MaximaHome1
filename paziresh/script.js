@@ -466,7 +466,7 @@ async function saveAsDraft() {
         admissionsData.unshift({ id: docId, ...draftRecord });
         
         showToast('پیش‌نویس با موفقیت ذخیره شد', 'success');
-        updateStatistics();
+    updateStatistics();
     } catch (error) {
         showToast('خطا در ذخیره پیش‌نویس', 'error');
     }
@@ -598,13 +598,13 @@ async function deleteAdmission(admissionId) {
             await deleteAdmissionFromFirebase(admissionId);
             
             // Remove from local array
-            admissionsData = admissionsData.filter(a => a.id !== admissionId);
-            
-            // Update lists
-            updateAllAdmissionsList();
+        admissionsData = admissionsData.filter(a => a.id !== admissionId);
+        
+        // Update lists
+        updateAllAdmissionsList();
             updateStatistics();
-            
-            showToast('پذیرش با موفقیت حذف شد', 'success');
+        
+        showToast('پذیرش با موفقیت حذف شد', 'success');
         } catch (error) {
             showToast('خطا در حذف پذیرش', 'error');
         }
@@ -715,7 +715,7 @@ function updateInvoicesList() {
         <div class="bg-white p-6 rounded-xl border border-gray-200 mb-4">
             <div class="flex justify-between items-start mb-4">
                 <div>
-                    <h3 class="text-lg font-medium text-black">فاکتور ${invoice.number}</h3>
+                    <h3 class="text-lg font-medium text-black">فاکتور ${invoice.invoiceNumber}</h3>
                     <p class="text-gray-600">${invoice.customer?.name || 'نامشخص'}</p>
                 </div>
                 <div class="text-left">
@@ -744,11 +744,11 @@ function updateInvoicesList() {
                     'bg-red-100 text-red-800'
                 }">${invoice.status}</span>
                 <div class="flex gap-2">
-                    <button onclick="viewInvoice('${invoice.number}')" 
+                    <button onclick="viewInvoice('${invoice.id}')" 
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
                         مشاهده
                     </button>
-                    <button onclick="deleteInvoice('${invoice.number}')" 
+                    <button onclick="deleteInvoice('${invoice.id}')" 
                             class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">
                         حذف
                     </button>
@@ -767,8 +767,8 @@ function createNewInvoice() {
 }
 
 // View invoice
-function viewInvoice(invoiceNumber) {
-    const invoice = invoicesData.find(i => i.number === invoiceNumber);
+function viewInvoice(invoiceId) {
+    const invoice = invoicesData.find(i => i.id === invoiceId);
     if (!invoice) return;
     
     const modal = document.getElementById('invoice-modal');
@@ -782,7 +782,7 @@ function viewInvoice(invoiceNumber) {
         <div class="bg-gray-50 p-6 rounded-xl">
             <div class="text-center mb-6">
                 <h2 class="text-2xl font-bold text-black">فاکتور</h2>
-                <p class="text-gray-600">شماره: ${invoice.number}</p>
+                <p class="text-gray-600">شماره: ${invoice.invoiceNumber}</p>
                 <p class="text-gray-600">تاریخ: ${new Date(invoice.date).toLocaleDateString('fa-IR')}</p>
             </div>
             
@@ -845,14 +845,14 @@ async function deleteInvoice(invoiceId) {
             
             // Remove from local array
             invoicesData = invoicesData.filter(i => i.id !== invoiceId);
-            
-            // Update invoices list
-            updateInvoicesList();
-            
-            // Update statistics
-            updateStatistics();
-            
-            showToast('فاکتور با موفقیت حذف شد', 'success');
+        
+        // Update invoices list
+        updateInvoicesList();
+        
+        // Update statistics
+        updateStatistics();
+        
+        showToast('فاکتور با موفقیت حذف شد', 'success');
         } catch (error) {
             showToast('خطا در حذف فاکتور', 'error');
         }
@@ -965,11 +965,11 @@ function checkLoginStatus() {
     onAuthStateChanged(window.firebase.auth, (user) => {
         if (user) {
             // User is signed in
-            showMainContent();
-        } else {
+        showMainContent();
+    } else {
             // User is signed out
-            showLoginForm();
-        }
+        showLoginForm();
+    }
     });
 }
 
@@ -982,8 +982,8 @@ async function logout() {
     try {
         const { signOut } = window.firebase;
         await signOut(window.firebase.auth);
-        showLoginForm();
-        showToast('خروج موفقیت‌آمیز', 'success');
+    showLoginForm();
+    showToast('خروج موفقیت‌آمیز', 'success');
     } catch (error) {
         console.error('Logout error:', error);
         showToast('خطا در خروج', 'error');
