@@ -4,6 +4,11 @@
 let admissionsData = [];
 let invoicesData = [];
 
+// Chart instances
+let admissionsChart = null;
+let revenueChart = null;
+let serviceTypesChart = null;
+
 // Firebase collections
 const ADMISSIONS_COLLECTION = 'admissions';
 const INVOICES_COLLECTION = 'invoices';
@@ -293,6 +298,11 @@ function showDashboard() {
     hideAllSections();
     document.getElementById('dashboard-section').classList.remove('hidden');
     updateStatistics();
+    
+    // Wait a bit for DOM to be ready, then create charts
+    setTimeout(() => {
+        updateCharts();
+    }, 100);
 }
 
 function showNewAdmission() {
@@ -351,14 +361,231 @@ function updateStatistics() {
         todayInvoicesEl.textContent = todayInvoices;
     }
     
-    // Today's income
-    const todayIncome = invoicesData
+    // Today's revenue
+    const todayRevenue = invoicesData
         .filter(invoice => new Date(invoice.date).toISOString().split('T')[0] === today)
         .reduce((sum, invoice) => sum + (parseInt(invoice.service?.actualCost) || 0), 0);
-    const todayIncomeEl = document.getElementById('today-income');
-    if (todayIncomeEl) {
-        todayIncomeEl.textContent = todayIncome.toLocaleString() + ' تومان';
+    const todayRevenueEl = document.getElementById('today-revenue');
+    if (todayRevenueEl) {
+        todayRevenueEl.textContent = todayRevenue.toLocaleString();
     }
+    
+    // Pending admissions
+    const pendingAdmissions = admissionsData.filter(admission => 
+        admission.status === 'ثبت شده' || admission.status === 'در انتظار'
+    ).length;
+    const pendingAdmissionsEl = document.getElementById('pending-admissions');
+    if (pendingAdmissionsEl) {
+        pendingAdmissionsEl.textContent = pendingAdmissions;
+    }
+    
+    // Update charts
+    updateCharts();
+}
+
+// Chart functions
+function updateCharts() {
+    if (typeof Chart === 'undefined') {
+        console.log('Chart.js not loaded yet');
+        return;
+    }
+    
+    createAdmissionsChart();
+    createRevenueChart();
+    createServiceTypesChart();
+}
+
+function createAdmissionsChart() {
+    const ctx = document.getElementById('admissionsChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (admissionsChart) {
+        admissionsChart.destroy();
+    }
+    
+    // Get last 7 days data
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        last7Days.push(date.toISOString().split('T')[0]);
+    }
+    
+    const admissionsCount = last7Days.map(date => {
+        return admissionsData.filter(admission => 
+            new Date(admission.date).toISOString().split('T')[0] === date
+        ).length;
+    });
+    
+    admissionsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: last7Days.map(date => new Date(date).toLocaleDateString('fa-IR')),
+            datasets: [{
+                label: 'تعداد پذیرش‌ها',
+                data: admissionsCount,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgb(59, 130, 246)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createRevenueChart() {
+    const ctx = document.getElementById('revenueChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (revenueChart) {
+        revenueChart.destroy();
+    }
+    
+    // Get last 12 months data
+    const last12Months = [];
+    for (let i = 11; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        last12Months.push(date.toISOString().substring(0, 7));
+    }
+    
+    const revenueData = last12Months.map(month => {
+        return invoicesData
+            .filter(invoice => invoice.date.startsWith(month))
+            .reduce((sum, invoice) => sum + (parseInt(invoice.service?.actualCost) || 0), 0);
+    });
+    
+    revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: last12Months.map(month => new Date(month + '-01').toLocaleDateString('fa-IR', { year: 'numeric', month: 'short' })),
+            datasets: [{
+                label: 'درآمد (تومان)',
+                data: revenueData,
+                backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                borderColor: 'rgb(168, 85, 247)',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' تومان';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createServiceTypesChart() {
+    const ctx = document.getElementById('serviceTypesChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (serviceTypesChart) {
+        serviceTypesChart.destroy();
+    }
+    
+    // Get service types data
+    const serviceTypes = {};
+    admissionsData.forEach(admission => {
+        const serviceType = admission.service?.type || 'نامشخص';
+        serviceTypes[serviceType] = (serviceTypes[serviceType] || 0) + 1;
+    });
+    
+    const labels = Object.keys(serviceTypes);
+    const data = Object.values(serviceTypes);
+    const colors = [
+        'rgba(239, 68, 68, 0.8)',
+        'rgba(34, 197, 94, 0.8)',
+        'rgba(59, 130, 246, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(245, 158, 11, 0.8)',
+        'rgba(236, 72, 153, 0.8)',
+        'rgba(14, 165, 233, 0.8)',
+        'rgba(34, 197, 94, 0.8)'
+    ];
+    
+    serviceTypesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors.slice(0, labels.length),
+                borderColor: '#fff',
+                borderWidth: 3,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Form submission handler
