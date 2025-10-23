@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم پذیرش خودرو - تعمیرگاه ماکسیما هوم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-jalaali/0.10.0/moment-jalaali.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-black">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="flex flex-col items-center gap-3">
+            <svg class="w-10 h-10 text-black animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            </svg>
+            <span class="text-xs text-black/50">در حال بارگذاری</span>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
+                <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">ورود به سیستم</h1>
+                <p class="text-gray-600">سیستم پذیرش خودرو - تعمیرگاه ماکسیما هوم</p>
+                </div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">نام کاربری</label>
+                        <input type="text" id="username" name="username" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">رمز عبور</label>
+                        <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div id="login-attempts" class="hidden text-red-600 text-sm">
+                    تلاش‌های ناموفق: <span id="attempts-count">0</span>
+                </div>
+
+                <div id="locked-message" class="hidden text-red-600 text-sm">
+                    حساب کاربری به دلیل تلاش‌های ناموفق قفل شده است. لطفاً بعداً تلاش کنید.
+                    </div>
+                    
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        ورود
+                    </button>
+                </form>
+        </div>
+        </div>
+
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
+        <!-- User Profile -->
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                    ا
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-900">ادمین</h3>
+                    <p class="text-sm text-gray-500">مدیر سیستم</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" onclick="showDashboard()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                        داشبورد
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showNewAdmission()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        پذیرش جدید
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAllAdmissions()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        مدیریت پذیرش‌ها
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showInvoices()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        فاکتورها
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showDailyReport()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        گزارش‌ها
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="logout()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        خروج
+                    </a>
+                </li>
+            </ul>
+        </nav>
+                </div>
+                
+    <!-- Main Content -->
+    <div class="ml-64">
+        <!-- Top Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                    <div>
+                    <h1 class="text-2xl font-bold text-gray-900">سیستم پذیرش خودرو</h1>
+                    <p class="text-sm text-gray-500">آخرین ورود: <span id="last-login-time">هم اکنون</span></p>
+                    </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="createNewInvoice()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        فاکتور جدید
+                    </button>
+                    <a href="../index.html" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        بازگشت به سایت
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="hidden">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="p-6">
+                <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl lg:text-5xl text-black mb-4 font-medium">
+                            سیستم پذیرش خودرو
+                    </h1>
+                    <p class="text-xl text-black/60 max-w-2xl mx-auto">
+                        سیستم داخلی ثبت پذیرش خودرو، تولید فاکتور و گزارش روزانه
+                    </p>
+                </div>
+                
+                    <!-- Quick Actions -->
+                    <div class="flex justify-center gap-6 mb-8">
+                        <button onclick="showNewAdmission()" class="bg-blue-600 text-white hover:bg-blue-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
+                            پذیرش جدید
+                        </button>
+                        <button onclick="showAllAdmissions()" class="bg-orange-600 text-white hover:bg-orange-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
+                            مدیریت پذیرش‌ها
+                        </button>
+                        <button onclick="showInvoices()" class="bg-purple-600 text-white hover:bg-purple-700 px-8 py-4 rounded-xl transition-colors font-medium text-lg">
+                            مدیریت فاکتورها
+                        </button>
+                    </div>
+            </div>
+        </section>
+
+        <!-- Car Admission Form -->
+            <section id="form-section" class="py-12 bg-gray-50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <!-- Progress Indicator -->
+                    <div class="flex justify-center mb-8">
+                        <div class="flex items-center space-x-4">
+                            <div class="step-indicator active" data-step="1">
+                                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                                <span class="text-sm text-gray-600 mt-1">اطلاعات مشتری</span>
+                        </div>
+                            <div class="w-8 h-1 bg-gray-300"></div>
+                            <div class="step-indicator" data-step="2">
+                                <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                                <span class="text-sm text-gray-600 mt-1">اطلاعات خودرو</span>
+                        </div>
+                            <div class="w-8 h-1 bg-gray-300"></div>
+                            <div class="step-indicator" data-step="3">
+                                <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                                <span class="text-sm text-gray-600 mt-1">اطلاعات سرویس</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="car-admission-form" class="space-y-8">
+                    <!-- Step 1: Customer Information -->
+                        <div id="step-1" class="form-step">
+                            <div class="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
+                                <h2 class="text-2xl font-medium text-black mb-6">اطلاعات مشتری</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                        <label for="customer-name" class="block text-sm font-medium text-gray-700 mb-2">نام مشتری</label>
+                                <input type="text" id="customer-name" name="customer-name"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                        <label for="customer-phone" class="block text-sm font-medium text-gray-700 mb-2">شماره تلفن</label>
+                                <input type="tel" id="customer-phone" name="customer-phone"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-6">
+                                    <button type="button" onclick="nextStep(2)" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                مرحله بعد
+                            </button>
+                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Vehicle Information -->
+                        <div id="step-2" class="form-step hidden">
+                            <div class="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
+                                <h2 class="text-2xl font-medium text-black mb-6">اطلاعات خودرو</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                        <label for="car-type" class="block text-sm font-medium text-gray-700 mb-2">نوع خودرو</label>
+                                <select id="car-type" name="car-type"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="">انتخاب کنید</option>
+                                            <option value="سدان">سدان</option>
+                                            <option value="هاچبک">هاچبک</option>
+                                            <option value="شاسی بلند">شاسی بلند</option>
+                                            <option value="ون">ون</option>
+                                            <option value="کامیون">کامیون</option>
+                                </select>
+                            </div>
+                            <div>
+                                        <label for="car-model" class="block text-sm font-medium text-gray-700 mb-2">مدل خودرو</label>
+                                <input type="text" id="car-model" name="car-model"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                        <label for="car-plate" class="block text-sm font-medium text-gray-700 mb-2">شماره پلاک</label>
+                                <input type="text" id="car-plate" name="car-plate"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-6">
+                            <button type="button" onclick="prevStep(1)" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                مرحله قبل
+                            </button>
+                                    <button type="button" onclick="nextStep(3)" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                مرحله بعد
+                            </button>
+                                </div>
+                        </div>
+                    </div>
+
+                        <!-- Step 3: Service Information -->
+                        <div id="step-3" class="form-step hidden">
+                            <div class="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
+                                <h2 class="text-2xl font-medium text-black mb-6">اطلاعات سرویس</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                        <label for="service-type" class="block text-sm font-medium text-gray-700 mb-2">نوع سرویس</label>
+                                <select id="service-type" name="service-type"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="">انتخاب کنید</option>
+                                    <option value="تعمیر موتور">تعمیر موتور</option>
+                                    <option value="تعمیر گیربکس">تعمیر گیربکس</option>
+                                    <option value="تعمیر ترمز">تعمیر ترمز</option>
+                                            <option value="تعمیر سیستم برق">تعمیر سیستم برق</option>
+                                            <option value="تعمیر سیستم خنک‌کننده">تعمیر سیستم خنک‌کننده</option>
+                                            <option value="سرویس دوره‌ای">سرویس دوره‌ای</option>
+                                </select>
+                            </div>
+                            <div>
+                                        <label for="actual-cost" class="block text-sm font-medium text-gray-700 mb-2">هزینه (تومان)</label>
+                                <input type="number" id="actual-cost" name="actual-cost"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                        <label for="admission-date" class="block text-sm font-medium text-gray-700 mb-2">تاریخ پذیرش (شمسی)</label>
+                                        <input type="text" id="admission-date" name="admission-date" 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="مثال: 1403/01/15">
+                            </div>
+                            <div>
+                                        <label for="admission-time" class="block text-sm font-medium text-gray-700 mb-2">ساعت پذیرش</label>
+                                <input type="time" id="admission-time" name="admission-time"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                                <div class="mt-6">
+                                    <label for="problem-description" class="block text-sm font-medium text-gray-700 mb-2">توضیحات مشکل</label>
+                                    <textarea id="problem-description" name="problem-description" rows="3" 
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                        <div class="flex justify-between mt-6">
+                            <button type="button" onclick="prevStep(2)" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                مرحله قبل
+                            </button>
+                                    <div class="flex gap-3">
+                                        <button type="button" onclick="saveAsDraft()" class="bg-yellow-600 text-white hover:bg-yellow-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                            ذخیره پیش‌نویس
+                                        </button>
+                                        <button type="submit" class="bg-green-600 text-white hover:bg-green-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                ثبت پذیرش
+                            </button>
+                        </div>
+                    </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Daily Report Section -->
+            <section id="daily-report-section" class="py-12 bg-gray-50 hidden">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-8">
+                        <h2 class="text-3xl font-medium text-black mb-4">گزارش روزانه</h2>
+                        <p class="text-lg text-black/60">پذیرش‌های امروز</p>
+                </div>
+                
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <button onclick="hideDailyReport()" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                            بستن
+                        </button>
+                </div>
+                
+                    <div id="admissions-list" class="bg-white p-6 rounded-2xl">
+                    <!-- لیست پذیرش‌ها اینجا نمایش داده می‌شود -->
+                </div>
+            </div>
+        </section>
+
+        <!-- All Admissions Section -->
+        <section id="all-admissions-section" class="py-12 bg-gray-50 hidden">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-medium text-black mb-4">مدیریت پذیرش‌ها</h2>
+                    <p class="text-lg text-black/60">لیست تمام پذیرش‌های ثبت شده</p>
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="hideAllAdmissions()" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                        بستن
+                    </button>
+                </div>
+                
+                <div id="all-admissions-list" class="bg-white p-6 rounded-2xl">
+                    <!-- لیست همه پذیرش‌ها اینجا نمایش داده می‌شود -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Invoices Section -->
+        <section id="invoices-section" class="py-12 bg-gray-50 hidden">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-medium text-black mb-4">مدیریت فاکتورها</h2>
+                    <p class="text-lg text-black/60">لیست فاکتورهای صادر شده</p>
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="createNewInvoice()" class="bg-green-600 text-white hover:bg-green-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                        فاکتور جدید
+                    </button>
+                    <button onclick="hideInvoices()" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                        بستن
+                    </button>
+                </div>
+                
+                <div id="invoices-list" class="bg-white p-6 rounded-2xl">
+                    <!-- لیست فاکتورها اینجا نمایش داده می‌شود -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Invoice View Modal -->
+        <div id="invoice-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-medium text-black">مشاهده فاکتور</h3>
+                        <button onclick="closeInvoiceModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                            ×
+                        </button>
+                    </div>
+                    <div id="invoice-content" class="space-y-4">
+                        <!-- محتوای فاکتور اینجا نمایش داده می‌شود -->
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button onclick="closeInvoiceModal()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                            بستن
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+                </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm">
+            <div class="flex items-center gap-3">
+                <div id="toast-icon" class="w-5 h-5"></div>
+                <p id="toast-message" class="text-sm font-medium text-gray-900"></p>
+                </div>
+                </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

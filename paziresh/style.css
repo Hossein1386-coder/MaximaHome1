@@ -1,0 +1,181 @@
+/* Custom styles for Paziresh system */
+
+/* Form loading state */
+.form-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Step indicators */
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-indicator.active .w-8 {
+    background-color: #2563eb;
+    color: white;
+}
+
+.step-indicator.completed .w-8 {
+    background-color: #10b981;
+    color: white;
+}
+
+/* Form steps */
+.form-step {
+    transition: all 0.3s ease;
+}
+
+.form-step.hidden {
+    display: none;
+}
+
+/* Login form styles */
+#login-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Sidebar styles */
+.sidebar {
+    transition: transform 0.3s ease;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .ml-64 {
+        margin-left: 0;
+    }
+    
+    .fixed.left-0 {
+        transform: translateX(-100%);
+    }
+    
+    .fixed.left-0.show {
+        transform: translateX(0);
+    }
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .sidebar,
+    header,
+    button {
+        display: none !important;
+    }
+    
+    .ml-64 {
+        margin-left: 0 !important;
+    }
+}
+
+/* Toast animations */
+#toast {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading screen */
+#loading-screen {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Card hover effects */
+.bg-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Button hover effects */
+button:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Input focus effects */
+input:focus,
+select:focus,
+textarea:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transition: all 0.2s ease;
+}
+
+/* Modal animations */
+#invoice-modal {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Statistics cards */
+.bg-white {
+    transition: all 0.3s ease;
+}
+
+.bg-white:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation active state */
+nav a.active {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* Responsive grid */
+@media (max-width: 640px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .flex-wrap {
+        flex-direction: column;
+    }
+    
+    .gap-4 > * {
+        margin-bottom: 1rem;
+    }
+}
