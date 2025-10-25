@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست خطاهای کنسول - سیستم پذیرش خودرو</title>
+    <style>
+        body {
+            font-family: 'Tahoma', Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #console-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 تست خطاهای کنسول - سیستم پذیرش خودرو</h1>
+        <p>این صفحه برای تشخیص مشکلات احتمالی در سیستم طراحی شده است.</p>
+        
+        <div class="test-section">
+            <h3>1. تست بارگذاری کتابخانه‌ها</h3>
+            <button onclick="testLibraries()">تست کتابخانه‌ها</button>
+            <div id="library-test"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. تست اتصال Firebase</h3>
+            <button onclick="testFirebase()">تست Firebase</button>
+            <div id="firebase-test"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. تست Chart.js</h3>
+            <button onclick="testCharts()">تست نمودارها</button>
+            <div id="chart-test"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. تست Moment.js</h3>
+            <button onclick="testMoment()">تست تاریخ شمسی</button>
+            <div id="moment-test"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. خروجی کنسول</h3>
+            <button onclick="clearConsole()">پاک کردن</button>
+            <div id="console-output"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>6. راهنمای رفع مشکل</h3>
+            <ul>
+                <li><strong>خطای CORS:</strong> ممکن است CDN ها مسدود باشند</li>
+                <li><strong>خطای Network:</strong> اتصال اینترنت را بررسی کنید</li>
+                <li><strong>خطای Firebase:</strong> کلیدهای API را بررسی کنید</li>
+                <li><strong>خطای Chart.js:</strong> کتابخانه لود نشده است</li>
+                <li><strong>خطای Moment.js:</strong> کتابخانه تاریخ شمسی لود نشده است</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Capture console output
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString('fa-IR');
+            const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : 'ℹ️';
+            consoleOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        function clearConsole() {
+            consoleOutput.textContent = '';
+        }
+        
+        function testLibraries() {
+            const result = document.getElementById('library-test');
+            result.innerHTML = '';
+            
+            const tests = [
+                { name: 'jQuery', test: () => typeof $ !== 'undefined' },
+                { name: 'Chart.js', test: () => typeof Chart !== 'undefined' },
+                { name: 'Moment.js', test: () => typeof moment !== 'undefined' },
+                { name: 'jsPDF', test: () => typeof jsPDF !== 'undefined' },
+                { name: 'html2canvas', test: () => typeof html2canvas !== 'undefined' }
+            ];
+            
+            tests.forEach(test => {
+                const div = document.createElement('div');
+                try {
+                    const success = test.test();
+                    div.className = success ? 'success' : 'error';
+                    div.textContent = `${success ? '✅' : '❌'} ${test.name}: ${success ? 'موجود' : 'غیرموجود'}`;
+                } catch (error) {
+                    div.className = 'error';
+                    div.textContent = `❌ ${test.name}: خطا - ${error.message}`;
+                }
+                result.appendChild(div);
+            });
+        }
+        
+        function testFirebase() {
+            const result = document.getElementById('firebase-test');
+            result.innerHTML = '';
+            
+            if (typeof window.firebase !== 'undefined') {
+                result.className = 'success';
+                result.innerHTML = '✅ Firebase: متصل و آماده استفاده';
+            } else {
+                result.className = 'error';
+                result.innerHTML = '❌ Firebase: متصل نیست - بررسی اتصال اینترنت و CDN ها';
+            }
+        }
+        
+        function testCharts() {
+            const result = document.getElementById('chart-test');
+            result.innerHTML = '';
+            
+            if (typeof Chart !== 'undefined') {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const chart = new Chart(canvas, {
+                        type: 'bar',
+                        data: { labels: ['تست'], datasets: [{ data: [1] }] }
+                    });
+                    chart.destroy();
+                    result.className = 'success';
+                    result.innerHTML = '✅ Chart.js: کار می‌کند';
+                } catch (error) {
+                    result.className = 'error';
+                    result.innerHTML = `❌ Chart.js: خطا - ${error.message}`;
+                }
+            } else {
+                result.className = 'error';
+                result.innerHTML = '❌ Chart.js: لود نشده است';
+            }
+        }
+        
+        function testMoment() {
+            const result = document.getElementById('moment-test');
+            result.innerHTML = '';
+            
+            if (typeof moment !== 'undefined') {
+                try {
+                    const persianDate = moment().format('jYYYY/jMM/jDD');
+                    result.className = 'success';
+                    result.innerHTML = `✅ Moment.js: کار می‌کند - تاریخ امروز: ${persianDate}`;
+                } catch (error) {
+                    result.className = 'error';
+                    result.innerHTML = `❌ Moment.js: خطا - ${error.message}`;
+                }
+            } else {
+                result.className = 'error';
+                result.innerHTML = '❌ Moment.js: لود نشده است';
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', function() {
+            console.log('🚀 شروع تست سیستم...');
+            setTimeout(() => {
+                testLibraries();
+                testFirebase();
+                testCharts();
+                testMoment();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

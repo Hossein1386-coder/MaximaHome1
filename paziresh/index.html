@@ -44,13 +44,14 @@
             for (const url of cdnUrls) {
                 try {
                     const module = await import(url);
-                    console.log(`Successfully loaded ${moduleName} from ${url}`);
+                    console.log(`✅ Successfully loaded ${moduleName} from ${url}`);
                     return module;
                 } catch (error) {
-                    console.warn(`Failed to load ${moduleName} from ${url}:`, error);
+                    console.warn(`⚠️ Failed to load ${moduleName} from ${url}:`, error.message);
                     continue;
                 }
             }
+            console.error(`❌ Failed to load ${moduleName} from any CDN`);
             throw new Error(`Failed to load ${moduleName} from any CDN`);
         }
         
@@ -96,6 +97,7 @@
         
         async function initializeFirebase() {
             try {
+                console.log('🔄 Initializing Firebase...');
                 const app = initializeApp(firebaseConfig);
                 const analytics = getAnalytics(app);
                 const db = getFirestore(app);
@@ -104,18 +106,18 @@
                 // Make Firebase available globally
                 window.firebase = { db, auth, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, signInWithEmailAndPassword, signOut, onAuthStateChanged };
                 
-                console.log('Firebase initialized successfully');
+                console.log('✅ Firebase initialized successfully');
                 return true;
             } catch (error) {
-                console.error('Firebase initialization failed:', error);
+                console.error('❌ Firebase initialization failed:', error.message);
                 retryCount++;
                 
                 if (retryCount < maxRetries) {
-                    console.log(`Retrying Firebase initialization (${retryCount}/${maxRetries})...`);
+                    console.log(`🔄 Retrying Firebase initialization (${retryCount}/${maxRetries})...`);
                     setTimeout(initializeFirebase, 2000 * retryCount); // Exponential backoff
                     return false;
                 } else {
-                    console.error('Firebase initialization failed after all retries');
+                    console.error('❌ Firebase initialization failed after all retries');
                     showToast('خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
                     return false;
                 }

@@ -239,9 +239,29 @@ function generateReceiptNumber() {
 function setMinimumDate() {
     const admissionDateInput = document.getElementById('admission-date');
     if (admissionDateInput) {
-        // Set today's date in Persian calendar
-        const today = moment().format('jYYYY/jMM/jDD');
-        admissionDateInput.value = today;
+        try {
+            // Set today's date in Persian calendar
+            if (typeof moment !== 'undefined') {
+                const today = moment().format('jYYYY/jMM/jDD');
+                admissionDateInput.value = today;
+                console.log('✅ Persian date set successfully');
+            } else {
+                console.warn('⚠️ Moment.js not loaded, using fallback date');
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                admissionDateInput.value = `${year}/${month}/${day}`;
+            }
+        } catch (error) {
+            console.error('❌ Error setting Persian date:', error.message);
+            // Fallback to regular date
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            admissionDateInput.value = `${year}/${month}/${day}`;
+        }
     }
     
     const admissionTimeInput = document.getElementById('admission-time');
@@ -386,13 +406,20 @@ function updateStatistics() {
 // Chart functions
 function updateCharts() {
     if (typeof Chart === 'undefined') {
-        console.log('Chart.js not loaded yet');
+        console.warn('⚠️ Chart.js not loaded yet, retrying in 1 second...');
+        setTimeout(updateCharts, 1000);
         return;
     }
     
-    createAdmissionsChart();
-    createRevenueChart();
-    createServiceTypesChart();
+    try {
+        console.log('📊 Creating charts...');
+        createAdmissionsChart();
+        createRevenueChart();
+        createServiceTypesChart();
+        console.log('✅ Charts created successfully');
+    } catch (error) {
+        console.error('❌ Error creating charts:', error.message);
+    }
 }
 
 function createAdmissionsChart() {
@@ -1896,25 +1923,50 @@ async function initializeApp() {
     }
 }
 
+// Global error handler
+window.addEventListener('error', function(event) {
+    console.error('❌ Global error:', event.error);
+    if (event.error && event.error.message) {
+        showToast(`خطا: ${event.error.message}`, 'error');
+    }
+});
+
+// Unhandled promise rejection handler
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('❌ Unhandled promise rejection:', event.reason);
+    if (event.reason && event.reason.message) {
+        showToast(`خطا در Promise: ${event.reason.message}`, 'error');
+    }
+});
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the application
-    initializeApp();
-    
-    // Update statistics on page load
-    updateStatistics();
-    
-    // Set minimum date
-    setMinimumDate();
-    
-    // Set up Persian date formatting
-    const admissionDateInput = document.getElementById('admission-date');
-    if (admissionDateInput) {
-        admissionDateInput.addEventListener('input', function() {
-            formatPersianDate(this);
-        });
+    try {
+        console.log('🚀 Initializing Paziresh System...');
+        
+        // Initialize the application
+        initializeApp();
+        
+        // Update statistics on page load
+        updateStatistics();
+        
+        // Set minimum date
+        setMinimumDate();
+        
+        // Set up Persian date formatting
+        const admissionDateInput = document.getElementById('admission-date');
+        if (admissionDateInput) {
+            admissionDateInput.addEventListener('input', function() {
+                formatPersianDate(this);
+            });
+        }
+        
+        // Hide loading screen after a delay
+        setTimeout(hideLoadingScreen, 1000);
+        
+        console.log('✅ Paziresh System initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing Paziresh System:', error);
+        showToast('خطا در راه‌اندازی سیستم', 'error');
     }
-    
-    // Hide loading screen after a delay
-    setTimeout(hideLoadingScreen, 1000);
 });
