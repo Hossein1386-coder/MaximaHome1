@@ -1089,7 +1089,8 @@ function viewInvoice(invoiceId) {
     content.innerHTML = `
         <div class="bg-gray-50 p-6 rounded-xl">
             <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-black">فاکتور</h2>
+                <h1 class="text-black font-extrabold text-xl mb-1">تعمیرگاه ماکسیما هوم</h1>
+                <h2 class="text-xl font-bold text-black">فاکتور</h2>
                 <p class="text-gray-600">شماره: ${invoice.invoiceNumber}</p>
                 <p class="text-gray-600">تاریخ: ${new Date(invoice.date).toLocaleDateString('fa-IR')}</p>
             </div>
@@ -1625,7 +1626,8 @@ function printInvoice(invoiceData) {
         <body>
             <div class="invoice-container">
                 <div class="invoice-header">
-                    <h1>فاکتور</h1>
+                    <h1>تعمیرگاه ماکسیما هوم</h1>
+                    <div style="font-size:14px;opacity:0.9;margin-top:4px;">فاکتور</div>
                     <div class="invoice-number">شماره: ${invoiceData.invoiceNumber}</div>
                     <div class="invoice-date">تاریخ: ${new Date(invoiceData.date).toLocaleDateString('fa-IR')}</div>
                 </div>
