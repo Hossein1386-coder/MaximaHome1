@@ -8,6 +8,12 @@ let invoicesData = [];
 let admissionsChart = null;
 let revenueChart = null;
 let serviceTypesChart = null;
+// Invoice filter state
+window.invoiceFilter = 'all';
+function setInvoiceFilter(filter) {
+    window.invoiceFilter = filter;
+    updateInvoicesList();
+}
 
 // Firebase collections
 const ADMISSIONS_COLLECTION = 'admissions';
@@ -93,6 +99,22 @@ async function saveAdmissionToFirebase(admissionData) {
     }
 }
 
+async function updateAdmissionInFirebase(admissionId, updates) {
+    try {
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) throw new Error('Firebase not available');
+        }
+        const { db, doc, updateDoc } = window.firebase;
+        await updateDoc(doc(db, ADMISSIONS_COLLECTION, admissionId), updates);
+    } catch (error) {
+        console.error('Error updating admission:', error);
+        showToast('خطا در بروزرسانی پذیرش', 'error');
+        throw error;
+    }
+}
+
 async function saveInvoiceToFirebase(invoiceData) {
     try {
         // Wait for Firebase to be available
@@ -110,6 +132,27 @@ async function saveInvoiceToFirebase(invoiceData) {
     } catch (error) {
         console.error('Error saving invoice:', error);
         showToast('خطا در ذخیره فاکتور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
+        throw error;
+    }
+}
+
+// Update existing invoice in Firebase
+async function updateInvoiceInFirebase(invoiceId, updates) {
+    try {
+        // Wait for Firebase to be available
+        if (!window.firebase) {
+            console.log('Waiting for Firebase to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!window.firebase) {
+                throw new Error('Firebase not available');
+            }
+        }
+        const { db, doc, updateDoc } = window.firebase;
+        const ref = doc(db, INVOICES_COLLECTION, invoiceId);
+        await updateDoc(ref, updates);
+    } catch (error) {
+        console.error('Error updating invoice:', error);
+        showToast('خطا در ذخیره فاکتور. لطفاً اتصال اینترنت را بررسی کنید.', 'error');
         throw error;
     }
 }
@@ -220,7 +263,10 @@ function formatFormData(formData) {
             admissionDate: formData.get('admission-date') || '',
             admissionTime: formData.get('admission-time') || '',
             description: formData.get('problem-description') || ''
-        }
+        },
+        parts: window.currentAdmissionParts || [],
+        totals: window.currentAdmissionTotals || null,
+        status: document.getElementById('admission-payment-status')?.value || 'ثبت شده'
     };
 }
 
@@ -270,6 +316,84 @@ function setMinimumDate() {
         const timeString = now.toTimeString().slice(0, 5);
         admissionTimeInput.value = timeString;
     }
+}
+
+// Admission parts table handlers
+function initializeAdmissionPartsUI() {
+    const rowsEl = document.getElementById('admission-parts-rows');
+    const addBtn = document.getElementById('admission-add-part-row');
+    const subtotalEl = document.getElementById('admission-parts-subtotal');
+    const laborAmountEl = document.getElementById('admission-labor-amount');
+    const grandEl = document.getElementById('admission-grand-total');
+    const actualCostInput = document.getElementById('actual-cost');
+
+    if (!rowsEl) return;
+
+    function toNumber(v){ const n = parseInt((v||'').toString().replace(/[\s,]/g,'')); return isNaN(n)?0:n; }
+    function format(n){ return (n||0).toLocaleString(); }
+
+    function parseRow(tr){
+        const [nameInp, qtyInp, unitInp] = tr.querySelectorAll('input');
+        const name = (nameInp?.value||'').trim();
+        const quantity = Math.max(1, toNumber(qtyInp?.value));
+        const unitPrice = toNumber(unitInp?.value);
+        return { name, quantity, unitPrice };
+    }
+
+    function updateRowTotal(tr){
+        const d = parseRow(tr);
+        const line = d.quantity * d.unitPrice;
+        const el = tr.querySelector('.admission-line-total');
+        if (el) el.textContent = format(line);
+        return line;
+    }
+
+    function updateTotals(){
+        const rows = Array.from(rowsEl.querySelectorAll('tr'));
+        const parts = rows.map(parseRow).filter(p => p.name || p.unitPrice);
+        const subtotal = parts.reduce((s,p)=>s+(p.quantity*p.unitPrice),0);
+        if (subtotalEl) subtotalEl.textContent = format(subtotal);
+        const labor = toNumber(actualCostInput?.value);
+        if (laborAmountEl) laborAmountEl.textContent = `${format(labor)} تومان`;
+        const grand = labor + subtotal;
+        if (grandEl) grandEl.textContent = `${format(grand)} تومان`;
+        window.currentAdmissionParts = parts;
+        window.currentAdmissionTotals = { partsSubtotal: subtotal, laborCost: labor, grandTotal: grand };
+    }
+
+    function bindRow(tr){
+        const inputs = tr.querySelectorAll('input');
+        inputs.forEach((inp, idx)=>{
+            inp.addEventListener('input', ()=>{
+                if (idx===2){ const raw = toNumber(inp.value); inp.value = raw ? raw.toLocaleString() : ''; }
+                updateRowTotal(tr); updateTotals();
+            });
+        });
+        const del = tr.querySelector('.admission-remove-row');
+        if (del) del.addEventListener('click', ()=>{ tr.remove(); updateTotals(); });
+        updateRowTotal(tr);
+    }
+
+    function createRow(part={ name:'', quantity:1, unitPrice:0 }){
+        const tr = document.createElement('tr');
+        tr.className = 'border-b';
+        tr.innerHTML = `
+            <td class="py-2 pr-2"><input type="text" class="w-full border rounded px-2 py-1" value="${part.name||''}" placeholder="مثلاً لنت جلو"></td>
+            <td class="py-2 text-center"><input type="number" min="1" class="w-20 border rounded px-2 py-1 text-center" value="${part.quantity||1}"></td>
+            <td class="py-2 text-center"><input type="text" class="w-32 border rounded px-2 py-1 text-center" value="${part.unitPrice?part.unitPrice.toLocaleString():''}" placeholder="0"></td>
+            <td class="py-2 pl-2 text-left"><span class="admission-line-total">0</span></td>
+            <td class="py-2 text-center"><button type="button" class="text-red-600 hover:underline admission-remove-row">حذف</button></td>
+        `;
+        rowsEl.appendChild(tr);
+        bindRow(tr); updateTotals();
+    }
+
+    if (addBtn) addBtn.addEventListener('click', ()=> createRow());
+    if (actualCostInput) actualCostInput.addEventListener('input', updateTotals);
+
+    // Load any existing parts for edit
+    const existing = Array.isArray(window.currentAdmissionParts) ? window.currentAdmissionParts : [];
+    if (existing.length>0) existing.forEach(p=>createRow(p)); else createRow();
 }
 
 // Format Persian date input
@@ -640,27 +764,32 @@ async function handleFormSubmission(e) {
     const formattedData = formatFormData(formData);
     const receiptNumber = generateReceiptNumber();
     
-    // Create admission record
+    // Create or update admission record
     const admissionRecord = {
         receiptNumber: receiptNumber,
         date: new Date().toISOString(),
         ...formattedData,
-        status: 'ثبت شده'
+        status: formattedData.status || 'ثبت شده'
     };
     
     try {
-        // Store in Firebase
-        const docId = await saveAdmissionToFirebase(admissionRecord);
+        // If editing, update existing; else create new
+        if (window.currentEditingAdmissionId) {
+            await updateAdmissionInFirebase(window.currentEditingAdmissionId, admissionRecord);
+            admissionsData = admissionsData.map(a => a.id === window.currentEditingAdmissionId ? { id: a.id, ...admissionRecord } : a);
+            showToast('پذیرش با موفقیت ویرایش شد.', 'success');
+        } else {
+            const docId = await saveAdmissionToFirebase(admissionRecord);
+            admissionsData.unshift({ id: docId, ...admissionRecord });
+            showToast(`پذیرش خودرو با شماره ${receiptNumber} ثبت شد.`, 'success');
+        }
         
-        // Add to local array for immediate UI update
-        admissionsData.unshift({ id: docId, ...admissionRecord });
-        
-        // Show success message
-        showToast(`پذیرش خودرو با شماره ${receiptNumber} ثبت شد.`, 'success');
-        
-        // Reset form
+        // Reset form and editing state
         form.reset();
-        setMinimumDate(); // Reset Persian date
+        setMinimumDate();
+        window.currentEditingAdmissionId = null;
+        window.currentAdmissionParts = [];
+        window.currentAdmissionTotals = null;
         
         // Update statistics
         updateStatistics();
@@ -878,6 +1007,9 @@ function editAdmission(admissionId) {
     
     // Store current admission ID for update
     window.currentEditingAdmissionId = admissionId;
+    // Load parts/status into admission form state
+    window.currentAdmissionParts = Array.isArray(admission.parts) ? admission.parts : [];
+    window.currentAdmissionTotals = admission.totals || null;
     
     // Show form and go to step 1
     hideAllSections();
@@ -1017,7 +1149,18 @@ function updateInvoicesList() {
     }
     
     // Sort by date (newest first)
-    const sortedInvoices = [...invoicesData].sort((a, b) => new Date(b.date) - new Date(a.date));
+    let filtered = [...invoicesData];
+    const f = (window.invoiceFilter || 'all');
+    if (f === 'open') {
+        filtered = filtered.filter(inv => inv.status !== 'پرداخت شده');
+    } else if (f === 'completed') {
+        filtered = filtered.filter(inv => inv.status === 'پرداخت شده');
+    } else if (f === 'cash') {
+        filtered = filtered.filter(inv => inv.status === 'پرداخت نقدی' || inv.status === 'پرداخت با کارت');
+    } else if (f === 'cheque') {
+        filtered = filtered.filter(inv => inv.status === 'پرداخت با چک');
+    }
+    const sortedInvoices = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     
     const listHTML = sortedInvoices.map(invoice => `
         <div class="bg-white p-6 rounded-xl border border-gray-200 mb-4">
@@ -1117,25 +1260,238 @@ function viewInvoice(invoiceId) {
                     <p class="text-gray-700">تاریخ پذیرش: ${invoice.service?.admissionDate || 'نامشخص'}</p>
                 </div>
             </div>
+
+            <div class="mb-6">
+                <h3 class="font-medium text-black mb-3">لوازم/قطعات تعویض‌شده:</h3>
+                <div class="bg-white p-4 rounded-lg">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                                <tr class="text-gray-600 border-b">
+                                    <th class="py-2 text-right pr-2">نام قطعه</th>
+                                    <th class="py-2 text-center">تعداد</th>
+                                    <th class="py-2 text-center">قیمت واحد (تومان)</th>
+                                    <th class="py-2 text-left pl-2">مبلغ خط</th>
+                                    <th class="py-2 text-center">حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parts-rows">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 flex justify-between items-center">
+                        <button id="add-part-row" class="bg-blue-600 text-white px-3 py-1 rounded">افزودن ردیف</button>
+                        <div class="text-gray-700">
+                            <span>جمع قطعات:</span>
+                            <span id="parts-subtotal" class="font-bold">0</span>
+                            <span>تومان</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="border-t pt-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-lg font-medium text-black">مبلغ کل:</span>
-                    <span class="text-xl font-bold text-black">${(invoice.service?.actualCost || 0).toLocaleString()} تومان</span>
+                    <span class="text-lg font-medium text-black">دستمزد/خدمت:</span>
+                    <span class="text-lg font-bold text-black">${(invoice.service?.actualCost || 0).toLocaleString()} تومان</span>
                 </div>
                 <div class="flex justify-between items-center mt-2">
-                    <span class="text-gray-600">وضعیت پرداخت:</span>
-                    <span class="px-3 py-1 rounded-full text-sm ${
+                    <span class="text-lg font-medium text-black">جمع قطعات:</span>
+                    <span class="text-lg font-bold text-black"><span id="parts-subtotal-inline">0</span> تومان</span>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <span class="text-lg font-medium text-black">مبلغ کل:</span>
+                    <span class="text-xl font-bold text-black" id="grand-total">${(invoice.service?.actualCost || 0).toLocaleString()} تومان</span>
+                </div>
+                <div class="flex justify-between items-center mt-3 gap-3">
+                    <label class="text-gray-700">وضعیت پرداخت:</label>
+                    <select id="payment-status-select" class="border rounded px-3 py-1 text-sm">
+                        <option value="پرداخت نشده">پرداخت نشده</option>
+                        <option value="پرداخت نقدی">پرداخت نقدی</option>
+                        <option value="پرداخت با کارت">پرداخت با کارت</option>
+                        <option value="پرداخت با چک">پرداخت با چک</option>
+                        <option value="پرداخت شده">پرداخت شده</option>
+                    </select>
+                    <span id="payment-status-badge" class="px-3 py-1 rounded-full text-sm ${
                         invoice.status === 'پرداخت شده' ? 'bg-green-100 text-green-800' :
-                        invoice.status === 'پرداخت نقدی' ? 'bg-blue-100 text-blue-800' :
+                        invoice.status === 'پرداخت نقدی' || invoice.status === 'پرداخت با کارت' ? 'bg-blue-100 text-blue-800' :
+                        invoice.status === 'پرداخت با چک' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
                     }">${invoice.status}</span>
+                    <button id="save-invoice-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm">ذخیره</button>
                 </div>
             </div>
         </div>
     `;
     
     modal.classList.remove('hidden');
+
+    // Parts table logic (editable in modal, stored in-memory on currentViewingInvoice)
+    try {
+        const partsRowsEl = document.getElementById('parts-rows');
+        const addRowBtn = document.getElementById('add-part-row');
+        const partsSubtotalEl = document.getElementById('parts-subtotal');
+        const partsSubtotalInlineEl = document.getElementById('parts-subtotal-inline');
+        const grandTotalEl = document.getElementById('grand-total');
+
+        // Load existing parts if present
+        const existingParts = Array.isArray(window.currentViewingInvoice?.parts) ? window.currentViewingInvoice.parts : [];
+
+        function toNumber(value) {
+            const n = parseInt((value || '').toString().replace(/[,\s]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatNumber(n) {
+            return (n || 0).toLocaleString();
+        }
+
+        function createRow(part = { name: '', quantity: 1, unitPrice: 0 }) {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b';
+            tr.innerHTML = `
+                <td class="py-2 pr-2"><input type="text" class="w-full border rounded px-2 py-1" value="${part.name || ''}" placeholder="مثلاً فیلتر روغن"></td>
+                <td class="py-2 text-center"><input type="number" min="1" class="w-20 border rounded px-2 py-1 text-center" value="${part.quantity || 1}"></td>
+                <td class="py-2 text-center"><input type="text" class="w-32 border rounded px-2 py-1 text-center" value="${part.unitPrice ? part.unitPrice.toLocaleString() : ''}" placeholder="0"></td>
+                <td class="py-2 pl-2 text-left"><span class="line-total">0</span></td>
+                <td class="py-2 text-center"><button class="text-red-600 hover:underline remove-row">حذف</button></td>
+            `;
+            partsRowsEl.appendChild(tr);
+            bindRow(tr);
+            updateTotals();
+        }
+
+        function parseRow(tr) {
+            const [nameInput, qtyInput, priceInput] = tr.querySelectorAll('input');
+            const name = nameInput.value.trim();
+            const quantity = Math.max(1, toNumber(qtyInput.value));
+            const unitPrice = toNumber(priceInput.value);
+            return { name, quantity, unitPrice };
+        }
+
+        function updateRowTotal(tr) {
+            const data = parseRow(tr);
+            const lineTotal = data.quantity * data.unitPrice;
+            const lineTotalEl = tr.querySelector('.line-total');
+            if (lineTotalEl) lineTotalEl.textContent = formatNumber(lineTotal);
+            return lineTotal;
+        }
+
+        function updateTotals() {
+            const rows = Array.from(partsRowsEl.querySelectorAll('tr'));
+            const parts = rows.map(parseRow).filter(p => p.name || p.unitPrice);
+            const subtotal = parts.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+            if (partsSubtotalEl) partsSubtotalEl.textContent = formatNumber(subtotal);
+            if (partsSubtotalInlineEl) partsSubtotalInlineEl.textContent = formatNumber(subtotal);
+            const labor = toNumber(invoice.service?.actualCost);
+            const grand = labor + subtotal;
+            if (grandTotalEl) grandTotalEl.textContent = `${formatNumber(grand)} تومان`;
+            // Persist into current invoice in-memory
+            window.currentViewingInvoice = {
+                ...window.currentViewingInvoice,
+                parts,
+                totals: { partsSubtotal: subtotal, laborCost: labor, grandTotal: grand }
+            };
+        }
+
+        function bindRow(tr) {
+            const inputs = tr.querySelectorAll('input');
+            inputs.forEach((inp, idx) => {
+                inp.addEventListener('input', () => {
+                    if (idx === 2) { // unit price formatting
+                        const raw = toNumber(inp.value);
+                        inp.value = raw ? raw.toLocaleString() : '';
+                    }
+                    updateRowTotal(tr);
+                    updateTotals();
+                });
+            });
+            const removeBtn = tr.querySelector('.remove-row');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    tr.remove();
+                    updateTotals();
+                });
+            }
+            updateRowTotal(tr);
+        }
+
+        if (addRowBtn) {
+            addRowBtn.addEventListener('click', () => createRow());
+        }
+
+        // Initialize with existing parts or one empty row
+        if (existingParts.length > 0) {
+            existingParts.forEach(p => createRow(p));
+        } else {
+            createRow();
+        }
+
+    } catch (e) {
+        console.error('Error initializing parts table:', e);
+    }
+
+    // Initialize and bind payment status select
+    try {
+        const statusSelect = document.getElementById('payment-status-select');
+        const statusBadge = document.getElementById('payment-status-badge');
+        const current = window.currentViewingInvoice?.status || invoice.status || 'پرداخت نشده';
+        if (statusSelect) {
+            statusSelect.value = current;
+            const applyBadgeClass = (value) => {
+                const base = 'px-3 py-1 rounded-full text-sm ';
+                let cls = 'bg-red-100 text-red-800';
+                if (value === 'پرداخت شده') cls = 'bg-green-100 text-green-800';
+                else if (value === 'پرداخت نقدی' || value === 'پرداخت با کارت') cls = 'bg-blue-100 text-blue-800';
+                else if (value === 'پرداخت با چک') cls = 'bg-yellow-100 text-yellow-800';
+                statusBadge.className = base + cls;
+            };
+            applyBadgeClass(current);
+            if (statusBadge) statusBadge.textContent = current;
+            statusSelect.addEventListener('change', (e) => {
+                const value = e.target.value;
+                // persist in current invoice (in-memory)
+                window.currentViewingInvoice = { ...window.currentViewingInvoice, status: value };
+                applyBadgeClass(value);
+                if (statusBadge) statusBadge.textContent = value;
+            });
+        }
+    } catch (e) {
+        console.error('Error initializing payment status control:', e);
+    }
+
+    // Save button handler: persist parts, totals, and status to Firebase and local state
+    try {
+        const saveBtn = document.getElementById('save-invoice-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', async () => {
+                const inv = window.currentViewingInvoice;
+                if (!inv || !inv.id) {
+                    showToast('خطا: شناسه فاکتور نامعتبر است', 'error');
+                    return;
+                }
+                const updates = {
+                    parts: Array.isArray(inv.parts) ? inv.parts : [],
+                    totals: inv.totals || null,
+                    status: inv.status || invoice.status || 'پرداخت نشده'
+                };
+                try {
+                    await updateInvoiceInFirebase(inv.id, updates);
+                    // Update local invoicesData
+                    invoicesData = invoicesData.map(i => i.id === inv.id ? { ...i, ...updates } : i);
+                    showToast('فاکتور با موفقیت ذخیره شد', 'success');
+                    // Refresh list if visible
+                    if (document.getElementById('invoices-section') && !document.getElementById('invoices-section').classList.contains('hidden')) {
+                        updateInvoicesList();
+                    }
+                } catch (err) {
+                    console.error('Save invoice error:', err);
+                }
+            });
+        }
+    } catch (e) {
+        console.error('Error binding save button:', e);
+    }
 }
 
 // Print invoice function
@@ -1683,9 +2039,51 @@ function printInvoice(invoiceData) {
                         </div>
                     </div>
                     
+                    <div class="info-card" style="background:#fff;border:1px solid #e9ecef;border-radius:8px;padding:16px;margin-bottom:16px;">
+                        <h3 style="color:#2c3e50;font-size:16px;margin-bottom:10px;">لوازم/قطعات تعویض‌شده</h3>
+                        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                            <thead>
+                                <tr style="border-bottom:1px solid #e9ecef;color:#495057;">
+                                    <th style="text-align:right;padding:6px 4px;">نام قطعه</th>
+                                    <th style="text-align:center;padding:6px 4px;">تعداد</th>
+                                    <th style="text-align:center;padding:6px 4px;">قیمت واحد</th>
+                                    <th style="text-align:left;padding:6px 4px;">مبلغ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${(() => {
+                                    const parts = Array.isArray(invoiceData?.parts) ? invoiceData.parts : [];
+                                    if (parts.length === 0) {
+                                        return `<tr><td colspan="4" style="text-align:center;color:#6c757d;padding:8px;">موردی ثبت نشده</td></tr>`;
+                                    }
+                                    return parts.map(p => {
+                                        const qty = parseInt(p.quantity) || 0;
+                                        const unit = parseInt(p.unitPrice) || 0;
+                                        const total = (qty * unit).toLocaleString();
+                                        return `<tr style=\"border-bottom:1px solid #f1f3f5;\"><td style=\"padding:6px 4px;\">${p.name || ''}</td><td style=\"text-align:center;\">${qty}</td><td style=\"text-align:center;\">${unit.toLocaleString()}</td><td style=\"text-align:left;\">${total}</td></tr>`;
+                                    }).join('');
+                                })()}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" style="text-align:right;padding:6px 4px;color:#495057;">جمع قطعات</td>
+                                    <td style="text-align:left;padding:6px 4px;font-weight:700;">${(invoiceData?.totals?.partsSubtotal || 0).toLocaleString()}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align:right;padding:6px 4px;color:#495057;">دستمزد/خدمت</td>
+                                    <td style="text-align:left;padding:6px 4px;font-weight:700;">${(parseInt(invoiceData?.service?.actualCost) || 0).toLocaleString()}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
                     <div class="total-section">
-                        <div class="total-amount">${(invoiceData.service?.actualCost || 0).toLocaleString()} تومان</div>
-                        <div class="total-status">مبلغ کل</div>
+                        <div class="total-amount">${(() => {
+                            const partsSubtotal = invoiceData?.totals?.partsSubtotal || 0;
+                            const labor = parseInt(invoiceData?.service?.actualCost) || 0;
+                            return (partsSubtotal + labor).toLocaleString();
+                        })()} تومان</div>
+                        <div class="total-status">مبلغ کل (قطعات + خدمت)</div>
                         <div class="status-badge ${invoiceData.status === 'پرداخت شده' ? 'status-paid' : 'status-unpaid'}">
                             ${invoiceData.status}
                         </div>
@@ -1752,7 +2150,9 @@ async function generateInvoiceForAdmission(admissionId) {
         customer: admission.customer,
         vehicle: admission.vehicle,
         service: admission.service,
-        status: 'پرداخت نشده'
+        status: admission.status === 'ثبت شده' ? 'پرداخت نشده' : (admission.status || 'پرداخت نشده'),
+        parts: Array.isArray(admission.parts) ? admission.parts : [],
+        totals: admission.totals || null
     };
     
     try {
@@ -1954,6 +2354,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set minimum date
         setMinimumDate();
+        // Initialize admission parts UI
+        initializeAdmissionPartsUI();
         
         // Set up Persian date formatting
         const admissionDateInput = document.getElementById('admission-date');
