@@ -1,6 +1,7 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "تعمیرگاه ماکسیما هوم - بهترین تعمیرگاه خودروهای خارجی یزد",
+  "short_name": "ماکسیما هوم",
+  "description": "تعمیر تخصصی ماکسیما، مزدا، رنو، هیوندای، کیا، نیسان و خودروهای چینی، ژاپنی، کره‌ای، اروپایی و هیبرید در یزد",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -17,5 +18,11 @@
   ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "fa",
+  "dir": "rtl",
+  "orientation": "any",
+  "categories": ["automotive", "business", "services"]
 }
