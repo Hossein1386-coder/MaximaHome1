@@ -2240,8 +2240,11 @@ async function handleLogin(e) {
 }
 
 function showMainContent() {
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('main-content').classList.remove('hidden');
+    // Login section is now on a separate page, so we just need to show the main content
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.classList.remove('hidden');
+    }
     showDashboard();
 }
 
@@ -2260,15 +2263,15 @@ function checkLoginStatus() {
             // User is signed in
             showMainContent();
         } else {
-            // User is signed out
-            showLoginForm();
+            // User is signed out - redirect to login page
+            window.location.href = 'login.html';
         }
     });
 }
 
 function showLoginForm() {
-    document.getElementById('login-section').style.display = 'flex';
-    document.getElementById('main-content').classList.add('hidden');
+    // Redirect to login page instead of showing login form
+    window.location.href = 'login.html';
 }
 
 async function logout() {
@@ -2318,11 +2321,8 @@ async function initializeApp() {
         form.addEventListener('submit', handleFormSubmission);
     }
     
-    // Set up login form
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
+    // Login form is now on a separate page (login.html)
+    // No need to set up login form listener here
 }
 
 // Global error handler
