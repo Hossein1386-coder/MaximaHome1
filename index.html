@@ -442,6 +442,78 @@
             </div>
         </section>
 
+        <!-- Video Shorts Section -->
+        <section id="stories" class="stories-section" dir="rtl">
+            <div class="container">
+              <div class="header">
+                <h3 style="color: #ffffff;">پست‌ها</h3>
+              </div>
+          
+              <div class="story-wrapper">
+                <button type="button" class="stories-prev" aria-label="بعدی" onclick="scrollStories(1)">‹</button>
+          
+                <div id="storiesTrack" class="story-list">
+                  <a href="#" class="story-card" role="listitem"
+                     data-src="media/video1.MP4" data-type="video" data-poster=""
+                     onclick="openStoryFromEl(this); return false;">
+                    <div class="story-play">▶</div>
+                    <video src="media/video1.MP4" muted playsinline preload="metadata"></video>
+                    <div class="story-title"></div>
+                  </a>
+          
+                  <a href="#" class="story-card" role="listitem"
+                     data-src="media/video2.MP4" data-type="video" data-poster=""
+                     onclick="openStoryFromEl(this); return false;">
+                    <div class="story-play">▶</div>
+                    <video src="media/video2.MP4" muted playsinline preload="metadata"></video>
+                    <div class="story-title"></div>
+                  </a>
+
+                  <!-- ویدیو شما - مسیر فایل ویدیو را اینجا قرار دهید -->
+                  <a href="#" class="story-card" role="listitem"
+                     data-src="media/video3.MP4" data-type="video" data-poster=""
+                     onclick="openStoryFromEl(this); return false;">
+                    <div class="story-play">▶</div>
+                    <video src="media/video3.MP4" muted playsinline preload="metadata"></video>
+                    <div class="story-title"></div>
+                  </a>
+          
+                  <a href="#" class="story-card" role="listitem"
+                     data-src="media/video4.MP4" data-type="video" data-poster="media/video4-poster.jpg"
+                     onclick="openStoryFromEl(this); return false;">
+                    <div class="story-play">▶</div>
+                    <video src="media/video4.MP4" muted playsinline preload="metadata"></video>
+                    <div class="story-title"></div>
+                  </a>
+                </div>
+          
+                <button type="button" class="stories-next" aria-label="قبلی" onclick="scrollStories(-1)">›</button>
+              </div>
+          
+              <!-- Modal viewer -->
+              <div id="storyModal" class="story-modal hidden" onclick="overlayClose(event)">
+                <div class="viewer" onclick="event.stopPropagation()">
+                  <div class="story-progress" id="storyProgress"></div>
+          
+                  <img id="storyImage" class="story-media hidden" alt="story image" />
+                  <div id="storySpinner" class="spinner hidden">
+                    <div class="spinner-ring"></div>
+                  </div>
+          
+                  <video id="storyVideo" class="story-media hidden" playsinline controls preload="auto">
+                    <source id="storySource" />
+                  </video>
+          
+                  <div class="tap tap-left" onclick="prevStory()" aria-hidden="true"></div>
+                  <div class="tap tap-right" onclick="nextStory()" aria-hidden="true"></div>
+          
+                  <button type="button" class="close-btn" aria-label="بستن" onclick="closeStoryModal()">✕</button>
+                </div>
+              </div>
+            </div>
+        </section>
+
+
         <!-- Car Brands & Services Section -->
         <section class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -591,77 +663,7 @@
             </div>
         </section>
 
-        <!-- Video Shorts Section -->
-        <section id="stories" class="stories-section" dir="rtl">
-            <div class="container">
-              <div class="header">
-                <h3>پست‌ها</h3>
-              </div>
-          
-              <div class="story-wrapper">
-                <button type="button" class="stories-prev" aria-label="بعدی" onclick="scrollStories(1)">‹</button>
-          
-                <div id="storiesTrack" class="story-list">
-                  <a href="#" class="story-card" role="listitem"
-                     data-src="media/video1.MP4" data-type="video" data-poster=""
-                     onclick="openStoryFromEl(this); return false;">
-                    <div class="story-play">▶</div>
-                    <video src="media/video1.MP4" muted playsinline preload="metadata"></video>
-                    <div class="story-title"></div>
-                  </a>
-          
-                  <a href="#" class="story-card" role="listitem"
-                     data-src="media/video2.MP4" data-type="video" data-poster=""
-                     onclick="openStoryFromEl(this); return false;">
-                    <div class="story-play">▶</div>
-                    <video src="media/video2.MP4" muted playsinline preload="metadata"></video>
-                    <div class="story-title"></div>
-                  </a>
-
-                  <!-- ویدیو شما - مسیر فایل ویدیو را اینجا قرار دهید -->
-                  <a href="#" class="story-card" role="listitem"
-                     data-src="media/video3.MP4" data-type="video" data-poster=""
-                     onclick="openStoryFromEl(this); return false;">
-                    <div class="story-play">▶</div>
-                    <video src="media/video3.MP4" muted playsinline preload="metadata"></video>
-                    <div class="story-title"></div>
-                  </a>
-          
-                  <a href="#" class="story-card" role="listitem"
-                     data-src="media/video4.MP4" data-type="video" data-poster="media/video4-poster.jpg"
-                     onclick="openStoryFromEl(this); return false;">
-                    <div class="story-play">▶</div>
-                    <video src="media/video4.MP4" muted playsinline preload="metadata"></video>
-                    <div class="story-title"></div>
-                  </a>
-                </div>
-          
-                <button type="button" class="stories-next" aria-label="قبلی" onclick="scrollStories(-1)">›</button>
-              </div>
-          
-              <!-- Modal viewer -->
-              <div id="storyModal" class="story-modal hidden" onclick="overlayClose(event)">
-                <div class="viewer" onclick="event.stopPropagation()">
-                  <div class="story-progress" id="storyProgress"></div>
-          
-                  <img id="storyImage" class="story-media hidden" alt="story image" />
-                  <div id="storySpinner" class="spinner hidden">
-                    <div class="spinner-ring"></div>
-                  </div>
-          
-                  <video id="storyVideo" class="story-media hidden" playsinline controls preload="auto">
-                    <source id="storySource" />
-                  </video>
-          
-                  <div class="tap tap-left" onclick="prevStory()" aria-hidden="true"></div>
-                  <div class="tap tap-right" onclick="nextStory()" aria-hidden="true"></div>
-          
-                  <button type="button" class="close-btn" aria-label="بستن" onclick="closeStoryModal()">✕</button>
-                </div>
-              </div>
-            </div>
-        </section>
-        <!-- About Section -->
+                <!-- About Section -->
         <section id="about" class="py-24 bg-black text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-16 items-center">

@@ -276,7 +276,7 @@ body.menu-open #bottom-nav {
 }
 
 /* basic layout */
-.stories-section { padding: 24px; background: #fff; font-family: Vazirmatn, sans-serif; }
+.stories-section { padding: 24px; background: #000000; font-family: Vazirmatn, sans-serif; }
 .container { max-width: 1200px; margin: 0 auto; }
 .header h3 { margin: 0 0 12px 0; color: #0f172a; font-weight: 800; }
 
@@ -284,14 +284,14 @@ body.menu-open #bottom-nav {
 .story-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
 .stories-prev,
 .stories-next {
-  background: #1f2937; color: #f3f4f6; border: 0; width: 36px; height: 36px; border-radius: 999px;
+  background: #ffffff; color: #000000; border: 0; width: 36px; height: 36px; border-radius: 999px;
   box-shadow: 0 6px 18px rgba(0,0,0,.12); cursor: pointer; font-size: 18px;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s ease;
 }
 .stories-prev:hover,
 .stories-next:hover {
-  background: #111827; transform: scale(1.05);
+  background: #ffffff; transform: scale(1.05);
 }
 
 /* story list */
