@@ -36,8 +36,9 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-# Disallow admin panel from search engines
+# Disallow admin panel and internal systems from search engines
 Disallow: /admin/
+Disallow: /paziresh/
 
 # Allow all other content
 Allow: /booking.html

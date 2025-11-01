@@ -222,3 +222,147 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Stories viewer logic
+(function () {
+    let lastStoryEl = null;
+  
+    function guessMime(url) {
+      const u = (url || "").toLowerCase();
+      if (u.includes(".mp4")) return "video/mp4";
+      if (u.includes(".webm")) return "video/webm";
+      if (u.includes(".ogg") || u.includes(".ogv")) return "video/ogg";
+      return "";
+    }
+  
+    function buildProgress(single = true) {
+      const host = document.getElementById('storyProgress');
+      if (!host) return null;
+      host.innerHTML = '';
+      const seg = document.createElement('div'); seg.className = 'seg';
+      const fill = document.createElement('div');
+      seg.appendChild(fill);
+      host.appendChild(seg);
+      return fill;
+    }
+  
+    window.openStoryModalWithPoster = function (src, type, poster, el) {
+      lastStoryEl = el || lastStoryEl;
+      const img = document.getElementById('storyImage');
+      const vid = document.getElementById('storyVideo');
+      const source = document.getElementById('storySource');
+      const spinner = document.getElementById('storySpinner');
+  
+      const fill = buildProgress();
+  
+      if (type && type.toLowerCase() === 'video') {
+        img.classList.add('hidden');
+        vid.classList.remove('hidden');
+        spinner.classList.remove('hidden');
+  
+        if (poster) vid.setAttribute('poster', poster); else vid.removeAttribute('poster');
+  
+        if (source) {
+          source.setAttribute('src', src || '');
+          source.setAttribute('type', guessMime(src));
+        }
+        try { vid.load(); } catch (e) { }
+        vid.currentTime = 0;
+  
+        const tryPlay = () => {
+          const p = vid.play();
+          if (p && typeof p.then === 'function') {
+            p.catch(function () { try { vid.muted = true; vid.play(); } catch (e) { } });
+          }
+        };
+  
+        vid.oncanplay = function () { spinner.classList.add('hidden'); tryPlay(); };
+        setTimeout(function () { spinner.classList.add('hidden'); tryPlay(); }, 1200);
+  
+        vid.onended = function () { nextStory(); };
+  
+      } else {
+        // Image path
+        vid.classList.add('hidden');
+        try { vid.pause(); } catch (e) { }
+        img.classList.remove('hidden');
+        img.src = src || '';
+        if (fill) {
+          fill.style.transitionDuration = '4s';
+          setTimeout(() => { fill.style.width = '100%'; }, 50);
+          setTimeout(() => { nextStory(); }, 4100);
+        }
+      }
+  
+      document.getElementById('storyModal').classList.remove('hidden');
+      return false;
+    };
+  
+    window.openStoryFromEl = function (a) {
+      lastStoryEl = a;
+      const src = a.getAttribute('data-src');
+      const type = a.getAttribute('data-type');
+      const poster = a.getAttribute('data-poster');
+      return openStoryModalWithPoster(src, type, poster, a);
+    };
+  
+    window.nextStory = function () {
+      if (!lastStoryEl) return;
+      let n = lastStoryEl.nextElementSibling;
+      // skip non-elements or text nodes
+      while (n && n.nodeType !== 1) n = n.nextSibling;
+      if (!n) return closeStoryModal();
+      openStoryFromEl(n);
+    };
+  
+    window.prevStory = function () {
+      if (!lastStoryEl) return;
+      let p = lastStoryEl.previousElementSibling;
+      while (p && p.nodeType !== 1) p = p.previousSibling;
+      if (!p) return;
+      openStoryFromEl(p);
+    };
+  
+    window.closeStoryModal = function () {
+      const modal = document.getElementById('storyModal');
+      const vid = document.getElementById('storyVideo');
+      const source = document.getElementById('storySource');
+      try {
+        vid.pause();
+        if (source) { source.removeAttribute('src'); source.removeAttribute('type'); }
+        vid.load();
+      } catch (e) { }
+      modal.classList.add('hidden');
+    };
+  
+    window.overlayClose = function (e) {
+      // only close when backdrop clicked
+      if (e.target && e.target.id === 'storyModal') closeStoryModal();
+    };
+  
+    window.scrollStories = function (dir) {
+      const track = document.getElementById('storiesTrack');
+      if (!track) return;
+      const step = 220;
+      // direction: -1 -> left, 1 -> right for RTL feel
+      track.scrollBy({ left: dir * step, behavior: 'smooth' });
+    };
+  
+    // Export small helper to open by index (optional)
+    window.openStoryAt = function (index) {
+      const list = document.querySelectorAll('.story-card');
+      if (!list || !list.length) return;
+      const el = list[index] || list[0];
+      if (el) openStoryFromEl(el);
+    };
+  
+    // small enhancement: keyboard support for modal
+    document.addEventListener('keydown', function (ev) {
+      const modal = document.getElementById('storyModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      if (ev.key === 'ArrowRight') nextStory();
+      if (ev.key === 'ArrowLeft') prevStory();
+      if (ev.key === 'Escape') closeStoryModal();
+    });
+  
+  })();

@@ -48,14 +48,6 @@
         <priority>0.6</priority>
     </url>
     
-    <!-- Paziresh System -->
-    <url>
-        <loc>https://maximahome.ir/paziresh/</loc>
-        <lastmod>2024-12-19</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.5</priority>
-    </url>
-    
     <!-- 404 Page -->
     <url>
         <loc>https://maximahome.ir/404.html</loc>
