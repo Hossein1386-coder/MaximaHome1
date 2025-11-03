@@ -371,3 +371,35 @@ body.menu-open #bottom-nav {
   .story-card { width: 140px; height: 200px; }
   .stories-prev, .stories-next { display: none; }
 }
+
+/* PWA Install Banner Styles - Full Screen */
+#pwa-install-banner {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.3s ease-out;
+}
+
+#pwa-install-banner:not(.hidden) {
+    opacity: 1;
+    transform: scale(1);
+}
+
+#pwa-install-banner > div {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+/* Smooth scroll for banner content */
+#pwa-install-banner > div::-webkit-scrollbar {
+    width: 4px;
+}
+
+#pwa-install-banner > div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#pwa-install-banner > div::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 2px;
+}

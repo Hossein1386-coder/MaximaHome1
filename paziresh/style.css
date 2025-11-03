@@ -179,3 +179,35 @@ nav a.active {
         margin-bottom: 1rem;
     }
 }
+
+/* PWA Install Banner Styles */
+#pwa-install-banner {
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease-out;
+}
+
+#pwa-install-banner:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#pwa-install-banner > div {
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Smooth scroll for banner content */
+#pwa-install-banner > div::-webkit-scrollbar {
+    width: 4px;
+}
+
+#pwa-install-banner > div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#pwa-install-banner > div::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 2px;
+}

@@ -366,3 +366,223 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   
   })();
+
+// Service Worker Registration for PWA (Booking)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // فقط برای booking.html ثبت شود
+        if (window.location.pathname.includes('booking.html') || window.location.pathname === '/booking.html') {
+            navigator.serviceWorker.register('/booking-sw.js')
+                .then((registration) => {
+                    console.log('✅ Service Worker registered successfully for booking:', registration.scope);
+                    
+                    // بررسی به‌روزرسانی Service Worker
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Service Worker جدید نصب شده است
+                                console.log('🔄 New Service Worker available. Please refresh the page.');
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('❌ Service Worker registration failed:', error);
+                });
+        }
+    });
+    
+    // مدیریت آفلاین/آنلاین
+    window.addEventListener('online', () => {
+        console.log('✅ Connection restored');
+    });
+    
+    window.addEventListener('offline', () => {
+        console.log('⚠️ Connection lost');
+    });
+}
+
+// PWA Install Banner Functions for Booking
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.innerWidth <= 768);
+}
+
+function isPWAInstalled() {
+    // بررسی اینکه آیا اپلیکیشن به صورت standalone نصب شده است
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true ||
+           document.referrer.includes('android-app://');
+}
+
+function shouldShowPWAInstallBanner() {
+    // فقط برای booking.html نمایش بده
+    if (!window.location.pathname.includes('booking.html') && window.location.pathname !== '/booking.html') {
+        return false;
+    }
+    
+    // اگر قبلاً دیده شده باشد، نمایش نده
+    const bannerDismissed = localStorage.getItem('pwa-install-banner-booking-dismissed');
+    if (bannerDismissed === 'true') {
+        return false;
+    }
+    
+    // اگر موبایل نیست، نمایش نده
+    if (!isMobileDevice()) {
+        return false;
+    }
+    
+    // اگر قبلاً نصب شده، نمایش نده
+    if (isPWAInstalled()) {
+        return false;
+    }
+    
+    // اگر Service Worker پشتیبانی نمی‌شود، نمایش نده
+    if (!('serviceWorker' in navigator)) {
+        return false;
+    }
+    
+    return true;
+}
+
+function showPWAInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner && shouldShowPWAInstallBanner()) {
+        // نمایش با انیمیشن
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+            banner.style.opacity = '0';
+            banner.style.transform = 'scale(0.95)';
+            banner.style.transition = 'all 0.3s ease-out';
+            
+            setTimeout(() => {
+                banner.style.opacity = '1';
+                banner.style.transform = 'scale(1)';
+            }, 10);
+        }, 100);
+    }
+}
+
+function closePWAInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) {
+        // انیمیشن خروج
+        banner.style.opacity = '0';
+        banner.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            banner.classList.add('hidden');
+            // ذخیره در localStorage که کاربر این بستر را دیده است
+            localStorage.setItem('pwa-install-banner-booking-dismissed', 'true');
+        }, 300);
+    }
+}
+
+// PWA Install Banner Functions for Main Site (index.html)
+// استفاده از توابع مشترک از بالا
+
+// PWA Install Banner for Main Site (index.html)
+function shouldShowPWAInstallBannerMain() {
+    // فقط برای index.html نمایش بده (نه booking و نه paziresh)
+    if (window.location.pathname.includes('booking.html') || 
+        window.location.pathname.includes('paziresh') ||
+        (window.location.pathname !== '/' && window.location.pathname !== '/index.html' && !window.location.pathname.endsWith('index.html'))) {
+        return false;
+    }
+    
+    // اگر قبلاً دیده شده باشد، نمایش نده
+    const bannerDismissed = localStorage.getItem('pwa-install-banner-main-dismissed');
+    if (bannerDismissed === 'true') {
+        return false;
+    }
+    
+    // اگر موبایل نیست، نمایش نده
+    if (!isMobileDevice()) {
+        return false;
+    }
+    
+    // اگر قبلاً نصب شده، نمایش نده
+    if (isPWAInstalled()) {
+        return false;
+    }
+    
+    // اگر Service Worker پشتیبانی نمی‌شود، نمایش نده (نیازی به PWA نیست)
+    if (!('serviceWorker' in navigator)) {
+        return false;
+    }
+    
+    return true;
+}
+
+function showPWAInstallBannerMain() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner && shouldShowPWAInstallBannerMain()) {
+        // نمایش با انیمیشن
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+            banner.style.opacity = '0';
+            banner.style.transform = 'scale(0.95)';
+            banner.style.transition = 'all 0.3s ease-out';
+            
+            setTimeout(() => {
+                banner.style.opacity = '1';
+                banner.style.transform = 'scale(1)';
+            }, 10);
+        }, 100);
+    }
+}
+
+function closePWAInstallBannerMain() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) {
+        // انیمیشن خروج
+        banner.style.opacity = '0';
+        banner.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            banner.classList.add('hidden');
+            // ذخیره در localStorage که کاربر این بستر را دیده است
+            localStorage.setItem('pwa-install-banner-main-dismissed', 'true');
+        }, 300);
+    }
+}
+
+// نمایش بستر PWA برای booking بعد از بارگذاری صفحه (از توابع booking استفاده می‌کند)
+if (window.location.pathname.includes('booking.html') || window.location.pathname === '/booking.html') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            showPWAInstallBanner(); // از توابع booking
+        }, 2000);
+    });
+}
+
+// نمایش بستر PWA برای صفحه اصلی (index.html) بعد از بارگذاری صفحه
+if (window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('index.html')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            showPWAInstallBannerMain(); // از توابع main site
+        }, 2000);
+    });
+}
+
+// تابع closePWAInstallBanner برای استفاده در onclick - باید هر دو را چک کند
+// این تابع global است و در HTML استفاده می‌شود
+window.closePWAInstallBanner = function() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) {
+        // انیمیشن خروج
+        banner.style.opacity = '0';
+        banner.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            banner.classList.add('hidden');
+            // ذخیره در localStorage که کاربر این بستر را دیده است
+            if (window.location.pathname.includes('booking.html') || window.location.pathname === '/booking.html') {
+                localStorage.setItem('pwa-install-banner-booking-dismissed', 'true');
+            } else {
+                localStorage.setItem('pwa-install-banner-main-dismissed', 'true');
+            }
+        }, 300);
+    }
+};
