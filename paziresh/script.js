@@ -198,7 +198,7 @@ async function deleteInvoiceFromFirebase(invoiceId) {
 }
 
 // Security credentials for Firebase Auth
-const ADMIN_EMAIL = 'admin@maximahome.com';
+const ADMIN_EMAIL = 'admin@mechaniclnd.ir';
 const ADMIN_PASSWORD = 'samad1379';
 
 // Current step for multi-step form
@@ -1232,7 +1232,7 @@ function viewInvoice(invoiceId) {
     content.innerHTML = `
         <div class="bg-gray-50 p-6 rounded-xl">
             <div class="text-center mb-6">
-                <h1 class="text-black font-extrabold text-xl mb-1">تعمیرگاه ماکسیما هوم</h1>
+                <h1 class="text-black font-extrabold text-xl mb-1">تعمیرگاه مکانیک لند</h1>
                 <h2 class="text-xl font-bold text-black">فاکتور</h2>
                 <p class="text-gray-600">شماره: ${invoice.invoiceNumber}</p>
                 <p class="text-gray-600">تاریخ: ${new Date(invoice.date).toLocaleDateString('fa-IR')}</p>
@@ -1982,7 +1982,7 @@ function printInvoice(invoiceData) {
         <body>
             <div class="invoice-container">
                 <div class="invoice-header">
-                    <h1>تعمیرگاه ماکسیما هوم</h1>
+                    <h1>تعمیرگاه مکانیک لند</h1>
                     <div style="font-size:14px;opacity:0.9;margin-top:4px;">فاکتور</div>
                     <div class="invoice-number">شماره: ${invoiceData.invoiceNumber}</div>
                     <div class="invoice-date">تاریخ: ${new Date(invoiceData.date).toLocaleDateString('fa-IR')}</div>
@@ -2091,7 +2091,7 @@ function printInvoice(invoiceData) {
                 </div>
                 
                 <div class="footer">
-                    <p>تعمیرگاه ماکسیما هوم - سیستم پذیرش خودرو</p>
+                    <p>تعمیرگاه مکانیک لند - سیستم پذیرش خودرو</p>
                     <p>این فاکتور به صورت خودکار تولید شده است</p>
                 </div>
             </div>

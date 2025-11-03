@@ -1,9 +1,9 @@
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "تعمیرگاه ماکسیما هوم",
+  "name": "تعمیرگاه مکانیک لند",
   "alternateName": [
-    "ماکسیما هوم یزد",
+    "مکانیک لند یزد",
     "تعمیرگاه ماشین چینی یزد",
     "تعمیرگاه خودرو هیبرید یزد",
     "مکانیکی یزد",
@@ -19,9 +19,9 @@
     "تعمیرگاه خودرو اروپایی یزد"
   ],
   "description": "بهترین تعمیرگاه خودروهای خارجی یزد | تعمیر تخصصی ماکسیما، مزدا، رنو، هیوندای، کیا، نیسان و خودروهای چینی، ژاپنی، کره‌ای، اروپایی و هیبرید در یزد. تعمیر موتور، گیربکس، سیستم برقی",
-  "url": "https://maximahome.ir",
+  "url": "https://mechaniclnd.ir",
   "telephone": "09902524062",
-  "email": "info@maximahome.ir",
+  "email": "info@mechaniclnd.ir",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "یزد، بلوار خامنه‌ای، خیابان اندیشه، اندیشه ۶",
@@ -113,8 +113,8 @@
     "reviewCount": "5000"
   },
   "sameAs": [
-    "https://www.instagram.com/maximahome_yazd",
-    "https://t.me/maximahome_yazd"
+    "https://www.instagram.com/mechanicland_yazd",
+    "https://t.me/mechanicland_yazd"
   ],
   "keywords": [
     "تعمیر ماشین چینی یزد",

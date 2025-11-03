@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://maximahome.ir/sitemap.xml
+Sitemap: https://mechaniclnd.ir/sitemap.xml
 
 # Crawl-delay for better server performance
 Crawl-delay: 1
