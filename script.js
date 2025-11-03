@@ -213,13 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
     handleScroll(); // Set initial active nav state
     checkForSuccessMessage(); // Check for form success message
     
-    // Hide loading screen after page is fully loaded (faster for minimal)
+    // Hide loading screen after page is fully loaded (optimized timing)
     if (document.readyState === 'complete') {
-        setTimeout(hideLoadingScreen, 700);
+        setTimeout(hideLoadingScreen, 300);
     } else {
         window.addEventListener('load', function() {
-            setTimeout(hideLoadingScreen, 700);
+            setTimeout(hideLoadingScreen, 300);
         });
+        // Also hide if DOM is ready (faster user experience)
+        setTimeout(hideLoadingScreen, 500);
     }
 });
 

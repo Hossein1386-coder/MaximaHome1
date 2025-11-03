@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Performance: Preconnect to external resources -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     
     <!-- Primary Meta Tags -->
     <title>تعمیرگاه مکانیک لند یزد | تعمیر ماشین چینی | تعمیر ماکسیما مزدا رنو | تعمیر هیوندای کیا نیسان | مکانیک لند</title>
@@ -339,7 +340,7 @@
                     <!-- Image -->
                     <div class="relative order-1 lg:order-2">
                         <div class="relative aspect-[16/9] rounded-2xl overflow-hidden">
-                            <img id="hero-image" loading="lazy" src="images/mm.png"
+                            <img id="hero-image" loading="eager" fetchpriority="high" src="images/mm.png"
                                  alt="کارگاه مکانیک لند" 
                                  class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black/10"></div>
@@ -457,7 +458,7 @@
                      data-src="media/video1.MP4" data-type="video" data-poster=""
                      onclick="openStoryFromEl(this); return false;">
                     <div class="story-play">▶</div>
-                    <video src="media/video1.MP4" muted playsinline preload="metadata"></video>
+                    <video src="media/video1.MP4" muted playsinline preload="none" loading="lazy"></video>
                     <div class="story-title"></div>
                   </a>
           
@@ -465,7 +466,7 @@
                      data-src="media/video2.MP4" data-type="video" data-poster=""
                      onclick="openStoryFromEl(this); return false;">
                     <div class="story-play">▶</div>
-                    <video src="media/video2.MP4" muted playsinline preload="metadata"></video>
+                    <video src="media/video2.MP4" muted playsinline preload="none" loading="lazy"></video>
                     <div class="story-title"></div>
                   </a>
 
@@ -474,7 +475,7 @@
                      data-src="media/video3.MP4" data-type="video" data-poster=""
                      onclick="openStoryFromEl(this); return false;">
                     <div class="story-play">▶</div>
-                    <video src="media/video3.MP4" muted playsinline preload="metadata"></video>
+                    <video src="media/video3.MP4" muted playsinline preload="none" loading="lazy"></video>
                     <div class="story-title"></div>
                   </a>
           
@@ -482,7 +483,7 @@
                      data-src="media/video4.MP4" data-type="video" data-poster="media/video4-poster.jpg"
                      onclick="openStoryFromEl(this); return false;">
                     <div class="story-play">▶</div>
-                    <video src="media/video4.MP4" muted playsinline preload="metadata"></video>
+                    <video src="media/video4.MP4" muted playsinline preload="none" loading="lazy"></video>
                     <div class="story-title"></div>
                   </a>
                 </div>
@@ -637,18 +638,21 @@
                     <div class="relative aspect-[4/3] rounded-2xl overflow-hidden group">
                         <img src="images/44.png" 
                              alt="تعمیرگاه مدرن" 
+                             loading="lazy"
                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                     </div>
                     <div class="relative aspect-[4/3] rounded-2xl overflow-hidden group">
                         <img src="images/new1.png" 
                              alt="تعمیر موتور" 
+                             loading="lazy"
                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                     </div>
                     <div class="relative aspect-[4/3] rounded-2xl overflow-hidden group">
                         <img src="images/08.png" 
                              alt="ابزار تخصصی" 
+                             loading="lazy"
                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                     </div>
@@ -1045,6 +1049,6 @@
         </button>
     </nav>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
