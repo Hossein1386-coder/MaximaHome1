@@ -3,6 +3,8 @@
 // Global variables for data storage
 let admissionsData = [];
 let invoicesData = [];
+// Invoices are read-only; they are generated from admissions only
+const INVOICES_READ_ONLY = true;
 
 // Chart instances
 let admissionsChart = null;
@@ -1199,10 +1201,8 @@ function updateInvoicesList() {
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
                         مشاهده
                     </button>
-                    <button onclick="deleteInvoice('${invoice.id}')" 
-                            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">
-                        حذف
-                    </button>
+                    ${INVOICES_READ_ONLY ? '' : `<button onclick="deleteInvoice('${invoice.id}')" 
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">حذف</button>`}
                 </div>
             </div>
         </div>
@@ -1280,7 +1280,7 @@ function viewInvoice(invoiceId) {
                         </table>
                     </div>
                     <div class="mt-3 flex justify-between items-center">
-                        <button id="add-part-row" class="bg-blue-600 text-white px-3 py-1 rounded">افزودن ردیف</button>
+                        ${INVOICES_READ_ONLY ? '' : '<button id="add-part-row" class="bg-blue-600 text-white px-3 py-1 rounded">افزودن ردیف</button>'}
                         <div class="text-gray-700">
                             <span>جمع قطعات:</span>
                             <span id="parts-subtotal" class="font-bold">0</span>
@@ -1305,20 +1305,20 @@ function viewInvoice(invoiceId) {
                 </div>
                 <div class="flex justify-between items-center mt-3 gap-3">
                     <label class="text-gray-700">وضعیت پرداخت:</label>
-                    <select id="payment-status-select" class="border rounded px-3 py-1 text-sm">
-                        <option value="پرداخت نشده">پرداخت نشده</option>
-                        <option value="پرداخت نقدی">پرداخت نقدی</option>
-                        <option value="پرداخت با کارت">پرداخت با کارت</option>
-                        <option value="پرداخت با چک">پرداخت با چک</option>
-                        <option value="پرداخت شده">پرداخت شده</option>
-                    </select>
+                    ${INVOICES_READ_ONLY ? '' : '<select id="payment-status-select" class="border rounded px-3 py-1 text-sm">\
+                        <option value="پرداخت نشده">پرداخت نشده</option>\
+                        <option value="پرداخت نقدی">پرداخت نقدی</option>\
+                        <option value="پرداخت با کارت">پرداخت با کارت</option>\
+                        <option value="پرداخت با چک">پرداخت با چک</option>\
+                        <option value="پرداخت شده">پرداخت شده</option>\
+                    </select>'}
                     <span id="payment-status-badge" class="px-3 py-1 rounded-full text-sm ${
                         invoice.status === 'پرداخت شده' ? 'bg-green-100 text-green-800' :
                         invoice.status === 'پرداخت نقدی' || invoice.status === 'پرداخت با کارت' ? 'bg-blue-100 text-blue-800' :
                         invoice.status === 'پرداخت با چک' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
                     }">${invoice.status}</span>
-                    <button id="save-invoice-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm">ذخیره</button>
+                    ${INVOICES_READ_ONLY ? '' : '<button id="save-invoice-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm">ذخیره</button>'}
                 </div>
             </div>
         </div>
@@ -1416,7 +1416,7 @@ function viewInvoice(invoiceId) {
             updateRowTotal(tr);
         }
 
-        if (addRowBtn) {
+        if (addRowBtn && !INVOICES_READ_ONLY) {
             addRowBtn.addEventListener('click', () => createRow());
         }
 
@@ -1436,7 +1436,7 @@ function viewInvoice(invoiceId) {
         const statusSelect = document.getElementById('payment-status-select');
         const statusBadge = document.getElementById('payment-status-badge');
         const current = window.currentViewingInvoice?.status || invoice.status || 'پرداخت نشده';
-        if (statusSelect) {
+        if (statusSelect && !INVOICES_READ_ONLY) {
             statusSelect.value = current;
             const applyBadgeClass = (value) => {
                 const base = 'px-3 py-1 rounded-full text-sm ';
@@ -1463,7 +1463,7 @@ function viewInvoice(invoiceId) {
     // Save button handler: persist parts, totals, and status to Firebase and local state
     try {
         const saveBtn = document.getElementById('save-invoice-btn');
-        if (saveBtn) {
+        if (saveBtn && !INVOICES_READ_ONLY) {
             saveBtn.addEventListener('click', async () => {
                 const inv = window.currentViewingInvoice;
                 if (!inv || !inv.id) {
