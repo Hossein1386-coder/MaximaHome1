@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اتصال اینترنت برقرار نیست - تعمیرگاه مکانیک لند یزد</title>
+    <meta name="description" content="اتصال اینترنت شما برقرار نیست. لطفاً اتصال خود را بررسی کنید.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    
+    <style>
+        /* Essential Tailwind-like styles for offline mode */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .z-50 { z-index: 50; }
+        .z-10 { z-index: 10; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        .bg-white { background-color: #fff; }
+        .bg-black { background-color: #000; }
+        .bg-black\/80 { background-color: rgba(0,0,0,0.8); }
+        .bg-black\/5 { background-color: rgba(0,0,0,0.05); }
+        .bg-black\/\[0\.02\] { background-color: rgba(0,0,0,0.02); }
+        .bg-white\/80 { background-color: rgba(255,255,255,0.8); }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-green-500 { background-color: #22c55e; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .text-black { color: #000; }
+        .text-white { color: #fff; }
+        .text-black\/60 { color: rgba(0,0,0,0.6); }
+        .text-black\/70 { color: rgba(0,0,0,0.7); }
+        .text-white\/60 { color: rgba(255,255,255,0.6); }
+        .text-2xl { font-size: 1.5rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-medium { font-weight: 500; }
+        .font-bold { font-weight: 700; }
+        .w-3 { width: 0.75rem; }
+        .h-3 { height: 0.75rem; }
+        .w-5 { width: 1.25rem; }
+        .h-5 { height: 1.25rem; }
+        .w-6 { width: 1.5rem; }
+        .h-6 { height: 1.5rem; }
+        .w-10 { width: 2.5rem; }
+        .h-10 { height: 2.5rem; }
+        .w-24 { width: 6rem; }
+        .h-24 { height: 6rem; }
+        .w-32 { width: 8rem; }
+        .h-32 { height: 8rem; }
+        .w-full { width: 100%; }
+        .max-w-4xl { max-width: 56rem; }
+        .max-w-7xl { max-width: 80rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mb-16 { margin-bottom: 4rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+        .border { border-width: 1px; }
+        .border-t { border-top-width: 1px; }
+        .border-black\/5 { border-color: rgba(0,0,0,0.05); }
+        .border-black\/10 { border-color: rgba(0,0,0,0.1); }
+        .border-black\/20 { border-color: rgba(0,0,0,0.2); }
+        .border-white\/10 { border-color: rgba(255,255,255,0.1); }
+        .overflow-hidden { overflow: hidden; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .leading-relaxed { line-height: 1.625; }
+        .min-h-screen { min-height: 100vh; }
+        .pt-16 { padding-top: 4rem; }
+        .pt-4 { padding-top: 1rem; }
+        .pt-8 { padding-top: 2rem; }
+        .hidden { display: none; }
+        .inline-block { display: inline-block; }
+        .inline-flex { display: inline-flex; }
+        .block { display: block; }
+        .grid { display: grid; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .hover\:bg-black\/80:hover { background-color: rgba(0,0,0,0.8); }
+        .hover\:bg-black\/5:hover { background-color: rgba(0,0,0,0.05); }
+        .hover\:opacity-70:hover { opacity: 0.7; }
+        .hover\:text-white:hover { color: #fff; }
+        .transition-colors { transition-property: color, background-color; transition-duration: 150ms; }
+        .transition-opacity { transition-property: opacity; transition-duration: 150ms; }
+        .transition-all { transition-property: all; transition-duration: 150ms; }
+        .backdrop-blur-md { backdrop-filter: blur(12px); }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (min-width: 640px) {
+            .sm\:flex-row { flex-direction: row; }
+            .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+        @media (min-width: 768px) {
+            .md\:flex { display: flex; }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:text-5xl { font-size: 3rem; }
+            .md\:hidden { display: none; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+        }
+        
+        /* Offline Page Specific Styles */
+        .error-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .error-number {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .floating-elements::before,
+        .floating-elements::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-elements::before {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-elements::after {
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        .wifi-icon {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-white text-black">
+    <!-- Main Content -->
+    <main>
+        <!-- Offline Error Section -->
+        <section class="relative min-h-screen flex items-center justify-center bg-white overflow-hidden">
+            <!-- Floating Background Elements -->
+            <div class="floating-elements"></div>
+            
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <!-- WiFi Icon -->
+                <div class="mb-8 fade-in">
+                    <div class="error-animation inline-block">
+                        <svg class="w-32 h-32 text-black/20 mx-auto wifi-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8.111 16.404a5.5 5.5 0 0 1 7.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div class="mb-12 fade-in" style="animation-delay: 0.2s;">
+                    <h2 class="text-4xl md:text-5xl text-black mb-6 font-medium">
+                        اتصال اینترنت برقرار نیست
+                    </h2>
+                    <p class="text-xl text-black/60 max-w-2xl mx-auto leading-relaxed">
+                        متأسفانه اتصال اینترنت شما قطع شده است. لطفاً اتصال خود را بررسی کنید و دوباره تلاش کنید.
+                    </p>
+                </div>
+
+                <!-- Connection Status -->
+                <div class="mb-8 fade-in" style="animation-delay: 0.4s;">
+                    <div id="connection-status" class="inline-flex items-center gap-3 bg-black/[0.02] px-6 py-3 rounded-lg border border-black/5">
+                        <div id="status-indicator" class="w-3 h-3 rounded-full bg-red-500 pulse-animation"></div>
+                        <span id="status-text" class="text-black/70">در حال بررسی اتصال...</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in" style="animation-delay: 0.6s;">
+                    <button onclick="checkConnection()" class="bg-black text-white hover:bg-black/80 px-8 py-4 rounded-lg transition-colors font-medium flex items-center justify-center gap-2 card-hover">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        تلاش مجدد
+                    </button>
+                    <a href="/" class="border border-black/20 text-black hover:bg-black/5 px-8 py-4 rounded-lg transition-colors font-medium flex items-center justify-center gap-2 card-hover">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        بازگشت به صفحه اصلی
+                    </a>
+                </div>
+
+                <!-- Help Section -->
+                <div class="bg-black/[0.02] p-8 rounded-2xl border border-black/5 fade-in" style="animation-delay: 0.8s;">
+                    <h3 class="text-2xl text-black mb-4 font-medium">راهنمای رفع مشکل</h3>
+                    <div class="text-right max-w-2xl mx-auto space-y-4 text-black/60">
+                        <div class="flex items-start gap-3">
+                            <span class="text-black font-medium mt-1">۱.</span>
+                            <p>بررسی کنید که دستگاه شما به وای‌فای یا داده تلفن همراه متصل باشد.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-black font-medium mt-1">۲.</span>
+                            <p>سعی کنید صفحه را رفرش کنید یا مرورگر را ببندید و دوباره باز کنید.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-black font-medium mt-1">۳.</span>
+                            <p>اگر مشکل ادامه داشت، مودم یا روتر خود را خاموش و روشن کنید.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-black font-medium mt-1">۴.</span>
+                            <p>برای اطلاعات بیشتر می‌توانید با ما تماس بگیرید.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="tel:09902524062" class="bg-black text-white hover:bg-black/80 px-6 py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            تماس تلفنی
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden transition-all">
+        <p id="toast-message"></p>
+    </div>
+
+    <script>
+        // Connection Check Function
+        function checkConnection() {
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (!statusIndicator || !statusText) return;
+            
+            // Don't try to fetch if we're offline
+            if (!navigator.onLine) {
+                statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500 pulse-animation';
+                statusText.textContent = 'اتصال برقرار نیست';
+                return;
+            }
+            
+            // Show checking status
+            statusIndicator.className = 'w-3 h-3 rounded-full bg-yellow-500 pulse-animation';
+            statusText.textContent = 'در حال بررسی اتصال...';
+            
+            // Try to fetch a small resource to check connection with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            
+            fetch('/', { method: 'HEAD', cache: 'no-cache', signal: controller.signal })
+                .then(() => {
+                    clearTimeout(timeoutId);
+                    // Connection is back
+                    statusIndicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                    statusText.textContent = 'اتصال برقرار است!';
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                })
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    // Still offline
+                    statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500 pulse-animation';
+                    statusText.textContent = 'اتصال برقرار نیست';
+                });
+        }
+
+        // Check connection status on load
+        window.addEventListener('load', function() {
+            // Hide loading screen immediately
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+            
+            // Set status
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                // Try to check connection, but don't wait if offline
+                checkConnection();
+            } else {
+                if (statusIndicator && statusText) {
+                    statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500 pulse-animation';
+                    statusText.textContent = 'اتصال برقرار نیست';
+                }
+            }
+        });
+
+        // Listen for online/offline events
+        window.addEventListener('online', function() {
+            checkConnection();
+        });
+
+        window.addEventListener('offline', function() {
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500 pulse-animation';
+            statusText.textContent = 'اتصال قطع شد';
+        });
+
+        // Toast Notification
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, duration);
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Check connection status on load
+        window.addEventListener('load', function() {
+            // Set status
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                // Try to check connection, but don't wait if offline
+                checkConnection();
+            } else {
+                if (statusIndicator && statusText) {
+                    statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500 pulse-animation';
+                    statusText.textContent = 'اتصال برقرار نیست';
+                }
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some interactive effects
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
