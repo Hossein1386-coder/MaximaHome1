@@ -61,13 +61,6 @@ ErrorDocument 404 /404.html
     ExpiresByType application/font-woff2 "access plus 1 year"
 </IfModule>
 
-# Cache-Control headers for static assets
-<IfModule mod_headers.c>
-    <FilesMatch "\.(js|css|png|jpe?g|gif|webp|svg|ico|woff2?)$">
-        Header set Cache-Control "public, max-age=2592000, immutable"
-    </FilesMatch>
-</IfModule>
-
 # Security Headers
 <IfModule mod_headers.c>
     # X-Frame-Options
