@@ -3,8 +3,8 @@
 // Global variables for data storage
 let admissionsData = [];
 let invoicesData = [];
-// Invoices are read-only; they are generated from admissions only
-const INVOICES_READ_ONLY = true;
+// Invoices can be deleted by admin
+const INVOICES_READ_ONLY = false;
 
 // Chart instances
 let admissionsChart = null;
@@ -1329,6 +1329,16 @@ function viewInvoice(invoiceId) {
     `;
     
     modal.classList.remove('hidden');
+    
+    // Show/hide delete button based on INVOICES_READ_ONLY flag
+    const deleteBtn = modal.querySelector('button[onclick="deleteInvoiceFromModal()"]');
+    if (deleteBtn) {
+        if (INVOICES_READ_ONLY) {
+            deleteBtn.style.display = 'none';
+        } else {
+            deleteBtn.style.display = 'inline-block';
+        }
+    }
 
     // Parts table logic (editable in modal, stored in-memory on currentViewingInvoice)
     try {
@@ -2136,6 +2146,38 @@ async function deleteInvoice(invoiceId) {
         updateStatistics();
         
         showToast('فاکتور با موفقیت حذف شد', 'success');
+        } catch (error) {
+            showToast('خطا در حذف فاکتور', 'error');
+        }
+    }
+}
+
+// Delete invoice from modal view
+async function deleteInvoiceFromModal() {
+    if (!window.currentViewingInvoice || !window.currentViewingInvoice.id) {
+        showToast('فاکتور یافت نشد', 'error');
+        return;
+    }
+    
+    const invoiceId = window.currentViewingInvoice.id;
+    if (confirm('آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟')) {
+        try {
+            // Remove from Firebase
+            await deleteInvoiceFromFirebase(invoiceId);
+            
+            // Remove from local array
+            invoicesData = invoicesData.filter(i => i.id !== invoiceId);
+        
+            // Update invoices list
+            updateInvoicesList();
+            
+            // Update statistics
+            updateStatistics();
+            
+            // Close modal
+            closeInvoiceModal();
+            
+            showToast('فاکتور با موفقیت حذف شد', 'success');
         } catch (error) {
             showToast('خطا در حذف فاکتور', 'error');
         }
