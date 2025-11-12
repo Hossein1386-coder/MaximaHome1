@@ -66,7 +66,7 @@ function toggleMobileMenu() {
 
 // Scroll Detection for Active Section
 function handleScroll() {
-    const sections = ['home', 'services', 'gallery', 'about', 'contact'];
+    const sections = ['home', 'services', 'gallery', 'about', 'faq', 'contact'];
     const scrollPosition = window.scrollY + 200;
 
     for (const section of sections) {
@@ -588,3 +588,58 @@ window.closePWAInstallBanner = function() {
         }, 300);
     }
 };
+
+// Toggle Share Buttons
+function toggleShareButtons() {
+    const container = document.getElementById('share-buttons-container');
+    const shareIcon = document.getElementById('share-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const buttons = container.querySelectorAll('.share-button');
+    
+    if (container.classList.contains('hidden')) {
+        // Show buttons
+        container.classList.remove('hidden');
+        shareIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        
+        // Animate buttons appearing
+        buttons.forEach((btn, index) => {
+            btn.style.opacity = '0';
+            btn.style.transform = 'translateY(20px) scale(0.8)';
+            setTimeout(() => {
+                btn.style.transition = 'all 0.3s ease-out';
+                btn.style.opacity = '1';
+                btn.style.transform = 'translateY(0) scale(1)';
+            }, index * 50);
+        });
+    } else {
+        // Hide buttons
+        buttons.forEach((btn, index) => {
+            setTimeout(() => {
+                btn.style.transition = 'all 0.2s ease-in';
+                btn.style.opacity = '0';
+                btn.style.transform = 'translateY(20px) scale(0.8)';
+            }, index * 30);
+        });
+        
+        setTimeout(() => {
+            container.classList.add('hidden');
+            shareIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }, 200);
+    }
+}
+
+// Close share buttons when clicking outside
+document.addEventListener('click', function(event) {
+    const container = document.getElementById('share-buttons-container');
+    const toggleBtn = document.getElementById('share-toggle-btn');
+    
+    if (container && !container.classList.contains('hidden')) {
+        const clickedInside = container.contains(event.target) || toggleBtn.contains(event.target);
+        
+        if (!clickedInside) {
+            toggleShareButtons();
+        }
+    }
+});

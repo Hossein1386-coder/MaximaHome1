@@ -19,34 +19,8 @@
         <priority>0.9</priority>
     </url>
     
-    <!-- Service Pages for Better SEO -->
-    <url>
-        <loc>https://mechaniclnd.ir/#services</loc>
-        <lastmod>2024-12-19</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>https://mechaniclnd.ir/#about</loc>
-        <lastmod>2024-12-19</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
-    <url>
-        <loc>https://mechaniclnd.ir/#contact</loc>
-        <lastmod>2024-12-19</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
-    <url>
-        <loc>https://mechaniclnd.ir/#gallery</loc>
-        <lastmod>2024-12-19</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-    </url>
+    <!-- Main Page Sections (Note: Hash URLs are not ideal, but included for completeness) -->
+    <!-- For better SEO, consider creating separate pages for each section -->
     
     <!-- 404 Page -->
     <url>
