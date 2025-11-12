@@ -206,30 +206,74 @@ const ADMIN_PASSWORD = 'samad1379';
 // Current step for multi-step form
 let currentStep = 1;
 
-// Toast notification system
+// Toast notification system using SweetAlert2
 function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    const toastIcon = document.getElementById('toast-icon');
-    const toastMessage = document.getElementById('toast-message');
-    
-    // Set icon based on type
-    if (type === 'success') {
-        toastIcon.innerHTML = '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-    } else if (type === 'error') {
-        toastIcon.innerHTML = '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
-    } else if (type === 'warning') {
-        toastIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
-    } else if (type === 'info') {
-        toastIcon.innerHTML = '<svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>';
+    if (typeof Swal === 'undefined') {
+        // Fallback to old toast if SweetAlert2 is not loaded
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastMessage = document.getElementById('toast-message');
+        
+        if (toast && toastIcon && toastMessage) {
+            if (type === 'success') {
+                toastIcon.innerHTML = '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+            } else if (type === 'error') {
+                toastIcon.innerHTML = '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+            }
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        return;
     }
     
-    toastMessage.textContent = message;
-    toast.classList.remove('hidden');
+    // Use SweetAlert2 for toast notifications
+    const iconMap = {
+        'success': 'success',
+        'error': 'error',
+        'warning': 'warning',
+        'info': 'info'
+    };
     
-    // Auto hide after 3 seconds
-        setTimeout(() => {
-            toast.classList.add('hidden');
-    }, 3000);
+    Swal.fire({
+        title: message,
+        icon: iconMap[type] || 'success',
+        toast: true,
+        position: 'top-start',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+}
+
+// Confirm dialog using SweetAlert2
+async function showConfirm(title, text, confirmButtonText = 'بله، مطمئنم', cancelButtonText = 'خیر، انصراف') {
+    if (typeof Swal === 'undefined') {
+        // Fallback to native confirm if SweetAlert2 is not loaded
+        return confirm(text || title);
+    }
+    
+    const result = await Swal.fire({
+        title: title,
+        text: text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: cancelButtonText,
+        reverseButtons: true,
+        allowOutsideClick: false,
+        allowEscapeKey: true
+    });
+    
+    return result.isConfirmed;
 }
 
 // Form validation
@@ -1038,19 +1082,26 @@ function editAdmission(admissionId) {
 
 // Delete admission
 async function deleteAdmission(admissionId) {
-    if (confirm('آیا مطمئن هستید که می‌خواهید این پذیرش را حذف کنید؟')) {
+    const confirmed = await showConfirm(
+        'حذف پذیرش',
+        'آیا مطمئن هستید که می‌خواهید این پذیرش را حذف کنید؟',
+        'بله، حذف کن',
+        'خیر، انصراف'
+    );
+    
+    if (confirmed) {
         try {
             // Remove from Firebase
             await deleteAdmissionFromFirebase(admissionId);
             
             // Remove from local array
-        admissionsData = admissionsData.filter(a => a.id !== admissionId);
+            admissionsData = admissionsData.filter(a => a.id !== admissionId);
         
-        // Update lists
-        updateAllAdmissionsList();
+            // Update lists
+            updateAllAdmissionsList();
             updateStatistics();
         
-        showToast('پذیرش با موفقیت حذف شد', 'success');
+            showToast('پذیرش با موفقیت حذف شد', 'success');
         } catch (error) {
             showToast('خطا در حذف پذیرش', 'error');
         }
@@ -2131,7 +2182,14 @@ function closeInvoiceModal() {
 
 // Delete invoice
 async function deleteInvoice(invoiceId) {
-    if (confirm('آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟')) {
+    const confirmed = await showConfirm(
+        'حذف فاکتور',
+        'آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟',
+        'بله، حذف کن',
+        'خیر، انصراف'
+    );
+    
+    if (confirmed) {
         try {
             // Remove from Firebase
             await deleteInvoiceFromFirebase(invoiceId);
@@ -2139,13 +2197,13 @@ async function deleteInvoice(invoiceId) {
             // Remove from local array
             invoicesData = invoicesData.filter(i => i.id !== invoiceId);
         
-        // Update invoices list
-        updateInvoicesList();
+            // Update invoices list
+            updateInvoicesList();
         
-        // Update statistics
-        updateStatistics();
+            // Update statistics
+            updateStatistics();
         
-        showToast('فاکتور با موفقیت حذف شد', 'success');
+            showToast('فاکتور با موفقیت حذف شد', 'success');
         } catch (error) {
             showToast('خطا در حذف فاکتور', 'error');
         }
@@ -2160,7 +2218,14 @@ async function deleteInvoiceFromModal() {
     }
     
     const invoiceId = window.currentViewingInvoice.id;
-    if (confirm('آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟')) {
+    const confirmed = await showConfirm(
+        'حذف فاکتور',
+        'آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟',
+        'بله، حذف کن',
+        'خیر، انصراف'
+    );
+    
+    if (confirmed) {
         try {
             // Remove from Firebase
             await deleteInvoiceFromFirebase(invoiceId);

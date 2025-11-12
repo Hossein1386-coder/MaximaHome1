@@ -25,6 +25,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- SweetAlert2 RTL Styles -->
+    <style>
+        /* RTL Support for SweetAlert2 */
+        .swal2-popup {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        .swal2-title {
+            text-align: right;
+            direction: rtl;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            font-weight: 600;
+        }
+        
+        .swal2-content {
+            text-align: right;
+            direction: rtl;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        .swal2-actions {
+            flex-direction: row-reverse;
+            gap: 10px;
+        }
+        
+        .swal2-confirm {
+            margin-left: 10px !important;
+            margin-right: 0 !important;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        .swal2-cancel {
+            margin-right: 10px !important;
+            margin-left: 0 !important;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        /* Toast RTL */
+        .swal2-toast {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        .swal2-toast .swal2-title {
+            text-align: right;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        .swal2-toast .swal2-content {
+            text-align: right;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        /* Icon positioning for RTL */
+        .swal2-icon {
+            margin: 0 auto 1.25em;
+        }
+        
+        /* Better spacing for RTL buttons */
+        .swal2-actions button {
+            padding: 0.625em 1.5em;
+        }
+    </style>
+    
     <!-- Firebase SDK -->
     <script type="module">
         // Import the functions you need from the SDKs you need
