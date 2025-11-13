@@ -1,14 +1,9 @@
 // Service Worker برای PWA رزرو وقت
-const CACHE_NAME = 'booking-v1';
-const RUNTIME_CACHE = 'booking-runtime-v1';
+const CACHE_NAME = 'booking-v2'; // Version updated to force cache refresh
+const RUNTIME_CACHE = 'booking-runtime-v2';
 
-// فایل‌های استاتیک که باید کش شوند
+// فایل‌های استاتیک که باید کش شوند (HTML files excluded for fresh content)
 const STATIC_CACHE_URLS = [
-  '/',
-  '/index.html',
-  '/booking.html',
-  '/style.css',
-  '/script.js',
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png'
@@ -89,7 +84,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache First برای فایل‌های محلی
+  // Network First برای HTML files - همیشه از سرور بگیر
+  if (request.headers.get('accept').includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // HTML را cache نکن - همیشه از سرور بگیر
+          return response;
+        })
+        .catch(() => {
+          // فقط در صورت عدم دسترسی به شبکه، از cache استفاده کن
+          return caches.match(request) || caches.match('/index.html');
+        })
+    );
+    return;
+  }
+
+  // Cache First برای فایل‌های استاتیک (تصاویر، فونت‌ها)
   event.respondWith(
     caches.match(request)
       .then((cachedResponse) => {
@@ -114,10 +125,8 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // اگر صفحه HTML درخواست شده و در کش نیست، صفحه اصلی را برگردان
-            if (request.headers.get('accept').includes('text/html')) {
-              return caches.match('/index.html');
-            }
+            // اگر فایل در کش نیست و شبکه در دسترس نیست، null برگردان
+            return null;
           });
       })
   );
