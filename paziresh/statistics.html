@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="آمار و گزارشات">
+    <meta name="description" content="داشبورد حرفه‌ای آمار و گزارشات درآمد روزانه، هفتگی، ماهیانه و سالیانه">
+    <title>آمار و گزارشات درآمد | سیستم پذیرش خودرو</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/paziresh/manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../android-chrome-512x512.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-jalaali/0.10.0/moment-jalaali.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- SweetAlert2 RTL Styles -->
+    <style>
+        .swal2-popup {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        .swal2-title {
+            text-align: right;
+            direction: rtl;
+        }
+        .swal2-content {
+            text-align: right;
+            direction: rtl;
+        }
+        .swal2-actions {
+            flex-direction: row-reverse;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        // Try multiple CDN sources for better accessibility
+        const firebaseCDNs = [
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js',
+            'https://cdn.jsdelivr.net/npm/firebase@10.7.1/app/dist/index.esm.js',
+            'https://unpkg.com/firebase@10.7.1/app/dist/index.esm.js'
+        ];
+        
+        const firestoreCDNs = [
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js',
+            'https://cdn.jsdelivr.net/npm/firebase@10.7.1/firestore/dist/index.esm.js',
+            'https://unpkg.com/firebase@10.7.1/firestore/dist/index.esm.js'
+        ];
+        
+        const authCDNs = [
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js',
+            'https://cdn.jsdelivr.net/npm/firebase@10.7.1/auth/dist/index.esm.js',
+            'https://unpkg.com/firebase@10.7.1/auth/dist/index.esm.js'
+        ];
+        
+        const analyticsCDNs = [
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js',
+            'https://cdn.jsdelivr.net/npm/firebase@10.7.1/analytics/dist/index.esm.js',
+            'https://unpkg.com/firebase@10.7.1/analytics/dist/index.esm.js'
+        ];
+        
+        // Dynamic import with fallback
+        async function loadFirebaseModule(cdnUrls, moduleName) {
+            for (const url of cdnUrls) {
+                try {
+                    const module = await import(url);
+                    console.log(`✅ Successfully loaded ${moduleName} from ${url}`);
+                    return module;
+                } catch (error) {
+                    console.warn(`⚠️ Failed to load ${moduleName} from ${url}:`, error.message);
+                    continue;
+                }
+            }
+            console.error(`❌ Failed to load ${moduleName} from any CDN`);
+            throw new Error(`Failed to load ${moduleName} from any CDN`);
+        }
+        
+        // Load Firebase modules
+        const { initializeApp } = await loadFirebaseModule(firebaseCDNs, 'firebase-app');
+        const { getAnalytics } = await loadFirebaseModule(analyticsCDNs, 'firebase-analytics');
+        const { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } = await loadFirebaseModule(firestoreCDNs, 'firebase-firestore');
+        const { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } = await loadFirebaseModule(authCDNs, 'firebase-auth');
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBO3KMKqhSCE7XlBs9M679U1cAxEFPYYM4",
+            authDomain: "maximahome-6beaa.firebaseapp.com",
+            projectId: "maximahome-6beaa",
+            storageBucket: "maximahome-6beaa.firebasestorage.app",
+            messagingSenderId: "995203170989",
+            appId: "1:995203170989:web:b3b42e123392cc058e3c24",
+            measurementId: "G-WCN6S728JG"
+        };
+        
+        // Initialize Firebase with retry mechanism
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        async function initializeFirebase() {
+            try {
+                console.log('🔄 Initializing Firebase...');
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+                
+                // Make Firebase available globally
+                window.firebase = { db, auth, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+                
+                console.log('✅ Firebase initialized successfully');
+                
+                // Check authentication
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) {
+                        window.location.href = 'login.html';
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error.message);
+                retryCount++;
+                
+                if (retryCount < maxRetries) {
+                    console.log(`🔄 Retrying Firebase initialization (${retryCount}/${maxRetries})...`);
+                    setTimeout(initializeFirebase, 2000 * retryCount); // Exponential backoff
+                    return false;
+                } else {
+                    console.error('❌ Firebase initialization failed after all retries');
+                    return false;
+                }
+            }
+        }
+        
+        // Start Firebase initialization
+        initializeFirebase();
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .filter-btn {
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-black">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center" style="display: flex;">
+        <div class="flex flex-col items-center gap-3">
+            <div class="loading-spinner"></div>
+            <span class="text-sm text-black/50">در حال بارگذاری آمار...</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900">آمار و گزارشات درآمد</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="exportToPDF()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        خروجی PDF
+                    </button>
+                    <button onclick="refreshData()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        به‌روزرسانی
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Time Filter Buttons -->
+        <div class="mb-8">
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="changeTimeFilter('daily')" id="filter-daily" class="filter-btn active px-6 py-3 rounded-lg border border-gray-300 hover:border-blue-500 transition-all font-medium">
+                    روزانه
+                </button>
+                <button onclick="changeTimeFilter('weekly')" id="filter-weekly" class="filter-btn px-6 py-3 rounded-lg border border-gray-300 hover:border-blue-500 transition-all font-medium">
+                    هفتگی
+                </button>
+                <button onclick="changeTimeFilter('monthly')" id="filter-monthly" class="filter-btn px-6 py-3 rounded-lg border border-gray-300 hover:border-blue-500 transition-all font-medium">
+                    ماهیانه
+                </button>
+                <button onclick="changeTimeFilter('yearly')" id="filter-yearly" class="filter-btn px-6 py-3 rounded-lg border border-gray-300 hover:border-blue-500 transition-all font-medium">
+                    سالیانه
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Revenue Card -->
+            <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">کل درآمد</p>
+                        <h3 id="total-revenue" class="text-2xl font-bold text-gray-900">۰ تومان</h3>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-xl">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span id="revenue-change" class="text-green-600 font-medium">+۰%</span>
+                    <span class="text-gray-500 mr-2">نسبت به دوره قبل</span>
+                </div>
+            </div>
+
+            <!-- Average Revenue Card -->
+            <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">میانگین درآمد</p>
+                        <h3 id="avg-revenue" class="text-2xl font-bold text-gray-900">۰ تومان</h3>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-xl">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-500">میانگین در هر واحد زمانی</span>
+                </div>
+            </div>
+
+            <!-- Total Admissions Card -->
+            <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">تعداد پذیرش</p>
+                        <h3 id="total-admissions" class="text-2xl font-bold text-gray-900">۰</h3>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-xl">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span id="admissions-change" class="text-green-600 font-medium">+۰%</span>
+                    <span class="text-gray-500 mr-2">نسبت به دوره قبل</span>
+                </div>
+            </div>
+
+            <!-- Best Day Card -->
+            <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">بهترین روز</p>
+                        <h3 id="best-day" class="text-2xl font-bold text-gray-900">-</h3>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-xl">
+                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span id="best-day-amount" class="text-gray-500">۰ تومان</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
+            <!-- Revenue Line Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">نمودار درآمد</h3>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue Bar Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">مقایسه درآمد</h3>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
+            <!-- Service Distribution Pie Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">توزیع درآمد بر اساس نوع خدمات</h3>
+                <div class="chart-container">
+                    <canvas id="serviceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Daily/Hourly Revenue Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">درآمد ساعتی</h3>
+                <div class="chart-container">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Admissions Table -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">جزئیات کامل پذیرش‌ها</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">تاریخ</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">مشتری</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">خودرو</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوع سرویس</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">اجرت</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">قطعات</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">جمع کل</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="details-table-body" class="divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                                <div class="loading-spinner mx-auto mb-2"></div>
+                                در حال بارگذاری...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="statistics.js"></script>
+</body>
+</html>
+
