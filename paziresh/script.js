@@ -1055,27 +1055,44 @@ function editAdmission(admissionId) {
     document.getElementById('admission-time').value = admission.service?.admissionTime || '';
     document.getElementById('problem-description').value = admission.service?.description || '';
     
+    // Load payment status if available
+    const paymentStatusSelect = document.getElementById('admission-payment-status');
+    if (paymentStatusSelect && admission.status) {
+        paymentStatusSelect.value = admission.status;
+    }
+    
     // Store current admission ID for update
     window.currentEditingAdmissionId = admissionId;
     // Load parts/status into admission form state
     window.currentAdmissionParts = Array.isArray(admission.parts) ? admission.parts : [];
     window.currentAdmissionTotals = admission.totals || null;
     
-    // Show form and go to step 1
+    // Show form and go to step 3 (where parts table is) to show all information
     hideAllSections();
     document.getElementById('form-section').classList.remove('hidden');
     
-    // Reset to step 1
-    currentStep = 1;
+    // Show all steps so user can see complete information
+    currentStep = 3;
     document.getElementById('step-1').classList.remove('hidden');
-    document.getElementById('step-2').classList.add('hidden');
-    document.getElementById('step-3').classList.add('hidden');
+    document.getElementById('step-2').classList.remove('hidden');
+    document.getElementById('step-3').classList.remove('hidden');
     
-    // Update step indicators
+    // Update step indicators - mark all as completed, step 3 as active
     document.querySelectorAll('.step-indicator').forEach(indicator => {
         indicator.classList.remove('active', 'completed');
     });
-    document.querySelector('[data-step="1"]').classList.add('active');
+    document.querySelector('[data-step="1"]').classList.add('completed');
+    document.querySelector('[data-step="2"]').classList.add('completed');
+    document.querySelector('[data-step="3"]').classList.add('active');
+    
+    // Clear existing parts rows and initialize parts UI after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        const rowsEl = document.getElementById('admission-parts-rows');
+        if (rowsEl) {
+            rowsEl.innerHTML = ''; // Clear existing rows
+        }
+        initializeAdmissionPartsUI();
+    }, 100);
     
     showToast('اطلاعات پذیرش در فرم بارگذاری شد. ویرایش کنید و ثبت کنید.', 'success');
 }
