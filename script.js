@@ -109,9 +109,104 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
+// Booking Form Multi-Step Navigation
+function nextBookingStep(step) {
+    // Validate current step before proceeding
+    if (step === 2) {
+        // Validate step 1
+        const name = document.getElementById('name')?.value.trim();
+        const phone = document.getElementById('phone')?.value.trim();
+        
+        if (!name || !phone) {
+            showToast('لطفا نام و شماره تماس را وارد کنید', 'error');
+            return;
+        }
+        
+        // Basic phone validation
+        if (phone.length < 10) {
+            showToast('شماره تماس معتبر نیست', 'error');
+            return;
+        }
+    } else if (step === 3) {
+        // Validate step 2 (car model is optional, so we can proceed)
+    }
+    
+    // Hide current step
+    const currentStep = step - 1;
+    const currentStepEl = document.getElementById(`booking-step-${currentStep}`);
+    if (currentStepEl) {
+        currentStepEl.classList.add('hidden');
+    }
+    
+    // Show next step
+    const nextStepEl = document.getElementById(`booking-step-${step}`);
+    if (nextStepEl) {
+        nextStepEl.classList.remove('hidden');
+        // Scroll to top of form
+        nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Update progress indicator
+    updateBookingProgress(step);
+}
+
+function prevBookingStep(step) {
+    // Hide current step
+    const currentStep = step + 1;
+    const currentStepEl = document.getElementById(`booking-step-${currentStep}`);
+    if (currentStepEl) {
+        currentStepEl.classList.add('hidden');
+    }
+    
+    // Show previous step
+    const prevStepEl = document.getElementById(`booking-step-${step}`);
+    if (prevStepEl) {
+        prevStepEl.classList.remove('hidden');
+        // Scroll to top of form
+        prevStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Update progress indicator
+    updateBookingProgress(step);
+}
+
+function updateBookingProgress(activeStep) {
+    // Update step indicators
+    const indicators = document.querySelectorAll('.step-indicator');
+    indicators.forEach((indicator, index) => {
+        const stepNumber = index + 1;
+        const circle = indicator.querySelector('div');
+        const line = indicator.nextElementSibling;
+        
+        if (stepNumber <= activeStep) {
+            // Active or completed step
+            indicator.classList.add('active');
+            circle.classList.remove('bg-gray-300', 'text-gray-600');
+            circle.classList.add('bg-black', 'text-white');
+            if (line && stepNumber < activeStep) {
+                // Line before active step should be filled
+                line.classList.remove('bg-gray-300');
+                line.classList.add('bg-black');
+            }
+        } else {
+            // Inactive step
+            indicator.classList.remove('active');
+            circle.classList.remove('bg-black', 'text-white');
+            circle.classList.add('bg-gray-300', 'text-gray-600');
+            if (line) {
+                line.classList.remove('bg-black');
+                line.classList.add('bg-gray-300');
+            }
+        }
+    });
+}
+
 // Booking Form Submission (guarded for pages without the form)
 const bookingForm = document.getElementById('booking-form');
 if (bookingForm) {
+    // Initialize progress indicator
+    updateBookingProgress(1);
+    
     // Set minimum date for booking (today)
     const dateInput = document.getElementById('date');
     if (dateInput) {
@@ -119,8 +214,10 @@ if (bookingForm) {
         dateInput.setAttribute('min', today);
     }
     
-    // Handle form submission
-    bookingForm.addEventListener('submit', function(e) {
+    // Handle form submission with AJAX to prevent redirect
+    bookingForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
         const name = document.getElementById('name')?.value || '';
         const phone = document.getElementById('phone')?.value || '';
         const service = document.getElementById('service')?.value || '';
@@ -128,7 +225,6 @@ if (bookingForm) {
         const time = document.getElementById('time')?.value || '';
         
         if (!name || !phone || !service || !date || !time) {
-            e.preventDefault();
             showToast('لطفا تمام فیلدهای الزامی را پر کنید', 'error');
             return;
         }
@@ -139,11 +235,51 @@ if (bookingForm) {
         submitBtn.textContent = 'در حال ارسال...';
         submitBtn.disabled = true;
         
-        // Reset button after a delay (in case of error)
-        setTimeout(() => {
+        try {
+            // Prepare form data
+            const formData = new FormData(this);
+            
+            // Submit to Formspree via AJAX
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                // Success - show success message
+                const form = document.getElementById('booking-form');
+                const successMessage = document.getElementById('success-message');
+                if (form && successMessage) {
+                    form.style.display = 'none';
+                    successMessage.classList.remove('hidden');
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                showToast('رزرو با موفقیت ثبت شد!', 'success');
+                
+                // Reset form
+                this.reset();
+            } else {
+                // Error from Formspree
+                const data = await response.json();
+                if (data.errors) {
+                    showToast('خطا در ارسال فرم: ' + data.errors.map(e => e.message).join(', '), 'error');
+                } else {
+                    showToast('خطا در ارسال فرم. لطفا دوباره تلاش کنید.', 'error');
+                }
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            // Network or other error
+            console.error('Form submission error:', error);
+            showToast('خطا در اتصال به سرور. لطفا اتصال اینترنت خود را بررسی کنید.', 'error');
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-        }, 5000);
+        }
     });
 }
 

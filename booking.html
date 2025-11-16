@@ -167,6 +167,26 @@
                     </p>
                 </div>
 
+                <!-- Progress Indicator -->
+                <div class="flex justify-center mb-8">
+                    <div class="flex items-center space-x-4">
+                        <div class="step-indicator active" data-step="1">
+                            <div class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                            <span class="text-sm text-black/60 mt-1">اطلاعات مشتری</span>
+                        </div>
+                        <div class="w-8 h-1 bg-gray-300"></div>
+                        <div class="step-indicator" data-step="2">
+                            <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                            <span class="text-sm text-black/60 mt-1">اطلاعات خودرو</span>
+                        </div>
+                        <div class="w-8 h-1 bg-gray-300"></div>
+                        <div class="step-indicator" data-step="3">
+                            <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                            <span class="text-sm text-black/60 mt-1">اطلاعات رزرو</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Booking Form -->
                 <div class="bg-white p-8 lg:p-10 rounded-3xl border border-black/5 shadow-xl">
                     <form id="booking-form" action="https://formspree.io/f/myzwydeq" method="POST" class="space-y-6">
@@ -174,94 +194,123 @@
                         <input type="hidden" name="_subject" value="رزرو جدید - تعمیرگاه مکانیک لند">
                         <input type="hidden" name="_next" value="booking.html?success=true">
                         
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <!-- Name -->
-                            <div class="space-y-2">
-                                <label class="block text-black font-medium">نام و نام خانوادگی *</label>
-                                <input type="text" id="name" name="name" required
-                                       placeholder="نام خود را وارد کنید"
-                                       class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
-                            </div>
+                        <!-- Step 1: Customer Information -->
+                        <div id="booking-step-1" class="form-step">
+                            <h2 class="text-2xl font-medium text-black mb-6">اطلاعات مشتری</h2>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- Name -->
+                                <div class="space-y-2">
+                                    <label class="block text-black font-medium">نام و نام خانوادگی *</label>
+                                    <input type="text" id="name" name="name" required
+                                           placeholder="نام خود را وارد کنید"
+                                           class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                </div>
 
-                            <!-- Phone -->
-                            <div class="space-y-2">
-                                <label class="block text-black font-medium">شماره تماس *</label>
-                                <input type="tel" id="phone" name="phone" required
-                                       placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                                       class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                <!-- Phone -->
+                                <div class="space-y-2">
+                                    <label class="block text-black font-medium">شماره تماس *</label>
+                                    <input type="tel" id="phone" name="phone" required
+                                           placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                                           class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6">
+                                <button type="button" onclick="nextBookingStep(2)" class="bg-black text-white hover:bg-black/80 px-6 py-3 rounded-lg transition-colors font-medium">
+                                    مرحله بعد
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Car Model -->
-                        <div class="space-y-2">
-                            <label class="block text-black font-medium">مدل خودرو</label>
-                            <input type="text" id="carModel" name="car_model"
-                                   placeholder="مثال: پژو ۲۰۶"
-                                   class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
-                        </div>
-
-                        <!-- Service Type -->
-                        <div class="space-y-2">
-                            <label class="block text-black font-medium">نوع خدمات *</label>
-                            <select id="service" name="service" required
-                                    class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
-                                <option value="">نوع خدمات را انتخاب کنید</option>
-                                <option value="تعمیرات موتور">تعمیرات موتور</option>
-                                <option value="تعمیرات گیربکس">تعمیرات گیربکس</option>
-                                <option value="سرویس و تعویض روغن">سرویس و تعویض روغن</option>
-                                <option value="سیستم برق خودرو">سیستم برق خودرو</option>
-                                <option value="تعمیرات جلوبندی">تعمیرات جلوبندی</option>
-                                <option value="خدمات اورژانسی">خدمات اورژانسی</option>
-                                <option value="سایر موارد">سایر موارد</option>
-                            </select>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <!-- Date -->
+                        <!-- Step 2: Vehicle Information -->
+                        <div id="booking-step-2" class="form-step hidden">
+                            <h2 class="text-2xl font-medium text-black mb-6">اطلاعات خودرو</h2>
+                            <!-- Car Model -->
                             <div class="space-y-2">
-                                <label class="block text-black font-medium">تاریخ رزرو *</label>
-                                <input type="date" id="date" name="date" required
+                                <label class="block text-black font-medium">مدل خودرو</label>
+                                <input type="text" id="carModel" name="car_model"
+                                       placeholder="مثال: پژو ۲۰۶"
                                        class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
                             </div>
+                            <div class="flex justify-between mt-6">
+                                <button type="button" onclick="prevBookingStep(1)" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                    مرحله قبل
+                                </button>
+                                <button type="button" onclick="nextBookingStep(3)" class="bg-black text-white hover:bg-black/80 px-6 py-3 rounded-lg transition-colors font-medium">
+                                    مرحله بعد
+                                </button>
+                            </div>
+                        </div>
 
-                            <!-- Time -->
+                        <!-- Step 3: Booking Information -->
+                        <div id="booking-step-3" class="form-step hidden">
+                            <h2 class="text-2xl font-medium text-black mb-6">اطلاعات رزرو</h2>
+                            <!-- Service Type -->
                             <div class="space-y-2">
-                                <label class="block text-black font-medium">ساعت رزرو *</label>
-                                <select id="time" name="time" required
+                                <label class="block text-black font-medium">نوع خدمات *</label>
+                                <select id="service" name="service" required
                                         class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
-                                    <option value="">ساعت را انتخاب کنید</option>
-                                    <option value="08:00">08:00</option>
-                                    <option value="09:00">09:00</option>
-                                    <option value="10:00">10:00</option>
-                                    <option value="11:00">11:00</option>
-                                    <option value="12:00">12:00</option>
-                                    <option value="13:00">13:00</option>
-                                    <option value="14:00">14:00</option>
-                                    <option value="15:00">15:00</option>
-                                    <option value="16:00">16:00</option>
-                                    <option value="17:00">17:00</option>
-                                    <option value="18:00">18:00</option>
+                                    <option value="">نوع خدمات را انتخاب کنید</option>
+                                    <option value="تعمیرات موتور">تعمیرات موتور</option>
+                                    <option value="تعمیرات گیربکس">تعمیرات گیربکس</option>
+                                    <option value="سرویس و تعویض روغن">سرویس و تعویض روغن</option>
+                                    <option value="سیستم برق خودرو">سیستم برق خودرو</option>
+                                    <option value="تعمیرات جلوبندی">تعمیرات جلوبندی</option>
+                                    <option value="خدمات اورژانسی">خدمات اورژانسی</option>
+                                    <option value="سایر موارد">سایر موارد</option>
                                 </select>
                             </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- Date -->
+                                <div class="space-y-2">
+                                    <label class="block text-black font-medium">تاریخ رزرو *</label>
+                                    <input type="date" id="date" name="date" required
+                                           class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                </div>
+
+                                <!-- Time -->
+                                <div class="space-y-2">
+                                    <label class="block text-black font-medium">ساعت رزرو *</label>
+                                    <select id="time" name="time" required
+                                            class="w-full h-12 px-4 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors">
+                                        <option value="">ساعت را انتخاب کنید</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="17:00">17:00</option>
+                                        <option value="18:00">18:00</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="space-y-2">
+                                <label class="block text-black font-medium">توضیحات اضافی</label>
+                                <textarea id="notes" name="notes" rows="4"
+                                          placeholder="در صورت نیاز، توضیحات تکمیلی درباره مشکل خودرو را بنویسید..."
+                                          class="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors resize-none"></textarea>
+                            </div>
+
+                            <div class="flex justify-between mt-6">
+                                <button type="button" onclick="prevBookingStep(2)" class="bg-gray-600 text-white hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors font-medium">
+                                    مرحله قبل
+                                </button>
+                                <button type="submit"
+                                        class="bg-black text-white hover:bg-black/80 px-6 py-3 rounded-lg transition-colors font-medium">
+                                    ثبت رزرو
+                                </button>
+                            </div>
+
+                            <p class="text-black/60 text-center mt-4">
+                                پس از ثبت رزرو، کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت
+                            </p>
                         </div>
-
-                        <!-- Notes -->
-                        <div class="space-y-2">
-                            <label class="block text-black font-medium">توضیحات اضافی</label>
-                            <textarea id="notes" name="notes" rows="4"
-                                      placeholder="در صورت نیاز، توضیحات تکمیلی درباره مشکل خودرو را بنویسید..."
-                                      class="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-black focus:outline-none transition-colors resize-none"></textarea>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit"
-                                class="w-full bg-black text-white hover:bg-black/80 h-12 rounded-lg transition-colors font-medium">
-                            ثبت رزرو
-                        </button>
-
-                        <p class="text-black/60 text-center">
-                            پس از ثبت رزرو، کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت
-                        </p>
                     </form>
                     
                     <!-- Success Message -->
