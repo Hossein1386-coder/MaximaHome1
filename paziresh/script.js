@@ -369,6 +369,8 @@ function setMinimumDate() {
 }
 
 // Admission parts table handlers
+let admissionPartsUIInitialized = false;
+
 function initializeAdmissionPartsUI() {
     const rowsEl = document.getElementById('admission-parts-rows');
     const addBtn = document.getElementById('admission-add-part-row');
@@ -420,7 +422,9 @@ function initializeAdmissionPartsUI() {
             });
         });
         const del = tr.querySelector('.admission-remove-row');
-        if (del) del.addEventListener('click', ()=>{ tr.remove(); updateTotals(); });
+        if (del) {
+            del.addEventListener('click', ()=>{ tr.remove(); updateTotals(); });
+        }
         updateRowTotal(tr);
     }
 
@@ -438,12 +442,27 @@ function initializeAdmissionPartsUI() {
         bindRow(tr); updateTotals();
     }
 
-    if (addBtn) addBtn.addEventListener('click', ()=> createRow());
-    if (actualCostInput) actualCostInput.addEventListener('input', updateTotals);
+    // Only add event listeners once
+    if (!admissionPartsUIInitialized) {
+        if (addBtn) {
+            addBtn.addEventListener('click', ()=> createRow());
+        }
+        if (actualCostInput) {
+            actualCostInput.addEventListener('input', updateTotals);
+        }
+        admissionPartsUIInitialized = true;
+    }
 
+    // Clear existing rows before loading new ones (to avoid duplicates)
+    rowsEl.innerHTML = '';
+    
     // Load any existing parts for edit
     const existing = Array.isArray(window.currentAdmissionParts) ? window.currentAdmissionParts : [];
-    if (existing.length>0) existing.forEach(p=>createRow(p)); else createRow();
+    if (existing.length>0) {
+        existing.forEach(p=>createRow(p));
+    } else {
+        createRow(); // Create one empty row if no parts exist
+    }
 }
 
 // Format Persian date input
@@ -1071,13 +1090,13 @@ function editAdmission(admissionId) {
     hideAllSections();
     document.getElementById('form-section').classList.remove('hidden');
     
-    // Show all steps so user can see complete information
+    // Show only step 3 (standard approach - user can navigate back if needed)
     currentStep = 3;
-    document.getElementById('step-1').classList.remove('hidden');
-    document.getElementById('step-2').classList.remove('hidden');
+    document.getElementById('step-1').classList.add('hidden');
+    document.getElementById('step-2').classList.add('hidden');
     document.getElementById('step-3').classList.remove('hidden');
     
-    // Update step indicators - mark all as completed, step 3 as active
+    // Update step indicators - mark previous steps as completed, step 3 as active
     document.querySelectorAll('.step-indicator').forEach(indicator => {
         indicator.classList.remove('active', 'completed');
     });
@@ -1085,14 +1104,11 @@ function editAdmission(admissionId) {
     document.querySelector('[data-step="2"]').classList.add('completed');
     document.querySelector('[data-step="3"]').classList.add('active');
     
-    // Clear existing parts rows and initialize parts UI after a short delay to ensure DOM is ready
+    // Initialize parts UI after a short delay to ensure DOM is ready
+    // The function will clear existing rows and load parts automatically
     setTimeout(() => {
-        const rowsEl = document.getElementById('admission-parts-rows');
-        if (rowsEl) {
-            rowsEl.innerHTML = ''; // Clear existing rows
-        }
         initializeAdmissionPartsUI();
-    }, 100);
+    }, 200);
     
     showToast('اطلاعات پذیرش در فرم بارگذاری شد. ویرایش کنید و ثبت کنید.', 'success');
 }
