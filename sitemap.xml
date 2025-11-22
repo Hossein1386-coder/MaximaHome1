@@ -7,27 +7,61 @@
     <!-- Main Pages - High Priority for SEO -->
     <url>
         <loc>https://mechaniclnd.ir/</loc>
-        <lastmod>2024-12-19</lastmod>
+        <lastmod>2024-12-20</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     
     <url>
         <loc>https://mechaniclnd.ir/booking.html</loc>
-        <lastmod>2024-12-19</lastmod>
+        <lastmod>2024-12-20</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     
-    <!-- Main Page Sections (Note: Hash URLs are not ideal, but included for completeness) -->
-    <!-- For better SEO, consider creating separate pages for each section -->
+    <!-- Note: For better SEO, consider creating separate pages for each section -->
+    <!-- Current site uses single-page design with hash navigation -->
+    <!-- Recommended: Create separate pages like /services.html, /about.html, etc. -->
     
     <!-- 404 Page -->
     <url>
         <loc>https://mechaniclnd.ir/404.html</loc>
-        <lastmod>2024-12-19</lastmod>
+        <lastmod>2024-12-20</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
     </url>
+    
+    <!-- Future pages to add when created:
+    <url>
+        <loc>https://mechaniclnd.ir/services.html</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://mechaniclnd.ir/about.html</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://mechaniclnd.ir/gallery.html</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://mechaniclnd.ir/contact.html</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://mechaniclnd.ir/faq.html</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    -->
     
 </urlset>
